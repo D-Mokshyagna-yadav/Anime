@@ -1,8 +1,8 @@
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache openssl ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/package-lock.json ./backend/
@@ -15,13 +15,12 @@ COPY . .
 RUN npm run build
 RUN npm prune --omit=dev
 
-FROM node:20-alpine AS production
+FROM node:20-bookworm-slim AS production
 
 WORKDIR /app
 
 # Install curl for healthcheck
-RUN apk add --no-cache curl
-RUN apk add --no-cache ca-certificates openssl && update-ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates openssl && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
 ENV PORT=5000
