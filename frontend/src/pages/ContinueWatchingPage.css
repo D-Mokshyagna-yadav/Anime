@@ -1,0 +1,412 @@
+/* Continue Watching Page - Neon Shogun Design System */
+
+:root {
+  --primary: #de8eff;
+  --primary-container: #d779ff;
+  --secondary: #00e3fd;
+  --background: #0c0e17;
+  --surface-container: #171924;
+  --surface-container-low: #11131d;
+  --surface-container-high: #1c1f2b;
+  --on-surface: #f0f0fd;
+  --on-surface-variant: #aaaab7;
+  --outline-variant: #464752;
+}
+
+.continue-watching-container {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--on-surface);
+  padding-top: 80px;
+}
+
+/* Hero Section */
+.hero-section {
+  padding: 4rem 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(222, 142, 255, 0.05) 0%, rgba(0, 227, 253, 0.05) 100%);
+  border-bottom: 1px solid rgba(70, 71, 82, 0.3);
+}
+
+.hero-section h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+/* Sort Section */
+.sort-section {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.sort-section label {
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.sort-btn {
+  padding: 0.6rem 1.25rem;
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  border: 1px solid rgba(70, 71, 82, 0.5);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.sort-btn:hover {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.sort-btn.active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  color: #4f006e;
+  border-color: var(--primary);
+}
+
+/* Anime Grid */
+.anime-grid {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 2rem 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+/* Continue Card */
+.continue-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.continue-card:hover {
+  transform: translateY(-8px);
+}
+
+.card-poster {
+  position: relative;
+  width: 100%;
+  padding-bottom: 150%;
+  overflow: hidden;
+  background: var(--surface-container-low);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.card-poster img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.continue-card:hover .card-poster img {
+  transform: scale(1.08);
+}
+
+.poster-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
+  z-index: 1;
+  box-shadow: inset 0 0 20px rgba(0, 227, 253, 0.1);
+}
+
+/* Resume Button */
+.btn-resume {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--secondary), rgba(0, 227, 253, 0.8));
+  color: #004d57;
+  border-radius: 50%;
+  text-decoration: none;
+  opacity: 0;
+  transition: all 0.3s ease;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.continue-card:hover .btn-resume {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.btn-resume:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 0 30px rgba(0, 227, 253, 0.4);
+}
+
+/* Episode Badge */
+.episode-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  color: #4f006e;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Card Info */
+.card-info {
+  padding: 0;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  color: var(--on-surface);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Progress Section */
+.progress-section {
+  margin-bottom: 0.75rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-container-low);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.8rem;
+  color: var(--on-surface-variant);
+  font-weight: 500;
+}
+
+.last-watched {
+  font-size: 0.8rem;
+  color: var(--on-surface-variant);
+  margin: 0.5rem 0 1rem 0;
+}
+
+/* Resume Button (Text) */
+.btn-resume-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, var(--secondary), rgba(0, 227, 253, 0.8));
+  color: #004d57;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-resume-text:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 227, 253, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: var(--on-surface);
+}
+
+.empty-state p {
+  color: var(--on-surface-variant);
+  margin: 0 0 2rem 0;
+  font-size: 1rem;
+}
+
+.btn-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  color: #4f006e;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-home:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(222, 142, 255, 0.3);
+}
+
+/* Skeleton Loading */
+.loading-grid {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 2rem 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.skeleton-card {
+  aspect-ratio: 2/3;
+  background: linear-gradient(90deg, var(--surface-container) 0%, var(--surface-container-high) 50%, var(--surface-container) 100%);
+  border-radius: 8px;
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .continue-watching-container {
+    padding-top: 60px;
+  }
+
+  .hero-section {
+    padding: 2rem 1rem;
+  }
+
+  .hero-section h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .sort-section {
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+    gap: 1rem;
+  }
+
+  .anime-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    margin: 2rem auto;
+    padding: 0 1rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+
+  .btn-resume-text {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section h1 {
+    font-size: 1.3rem;
+  }
+
+  .sort-buttons {
+    width: 100%;
+  }
+
+  .sort-btn {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .anime-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+  }
+
+  .card-title {
+    font-size: 0.8rem;
+  }
+
+  .btn-resume {
+    width: 60px;
+    height: 60px;
+  }
+}

@@ -1,0 +1,144 @@
+.watchlist-container {
+  margin-top: 80px;
+  padding: 40px 20px;
+}
+
+.watchlist-header {
+  margin-bottom: 40px;
+}
+
+.watchlist-header h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.watchlist-header p {
+  opacity: 0.6;
+  font-size: 0.9rem;
+}
+
+.watchlist-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 100, 100, 0.1);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  border-radius: 8px;
+  color: #ff6464;
+  margin-bottom: 20px;
+}
+
+.watchlist-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.filter-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.watchlist-group {
+  margin-bottom: 40px;
+}
+
+.group-title {
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.watchlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.watchlist-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.watchlist-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--primary);
+  transform: translateY(-4px);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.item-header h3 {
+  flex: 1;
+  font-size: 0.95rem;
+  word-break: break-word;
+  margin: 0;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 100, 100, 0.6);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover {
+  color: #ff6464;
+}
+
+.item-progress {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  margin-bottom: 12px;
+  padding: 6px 0;
+}
+
+.item-footer {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-ghost {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}

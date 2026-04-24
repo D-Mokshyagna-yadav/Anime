@@ -1,0 +1,393 @@
+/* Settings Page - Neon Shogun Design System */
+
+:root {
+  --primary: #de8eff;
+  --primary-container: #d779ff;
+  --secondary: #00e3fd;
+  --background: #0c0e17;
+  --surface-container: #171924;
+  --surface-container-low: #11131d;
+  --surface-container-high: #1c1f2b;
+  --surface-container-highest: #222532;
+  --on-surface: #f0f0fd;
+  --on-surface-variant: #aaaab7;
+  --outline-variant: #464752;
+  --error: #ff6e84;
+  --error-container: #a70138;
+}
+
+.settings-container {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--on-surface);
+  padding-top: 80px;
+}
+
+/* Header */
+.settings-header {
+  padding: 3rem 2rem;
+  border-bottom: 1px solid rgba(70, 71, 82, 0.3);
+  background: linear-gradient(135deg, rgba(222, 142, 255, 0.05) 0%, rgba(0, 227, 253, 0.05) 100%);
+}
+
+.settings-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.breadcrumb {
+  color: var(--on-surface-variant);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Messages */
+.success-alert,
+.error-alert {
+  max-width: 1200px;
+  margin: 1.5rem auto;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 500;
+}
+
+.success-alert {
+  background: rgba(76, 255, 170, 0.1);
+  border: 1px solid rgba(76, 255, 170, 0.3);
+  color: #4cffaa;
+}
+
+.error-alert {
+  background: rgba(255, 110, 132, 0.1);
+  border: 1px solid rgba(255, 110, 132, 0.3);
+  color: var(--error);
+}
+
+/* Layout */
+.settings-layout {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 3rem;
+}
+
+/* Sidebar */
+.settings-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+}
+
+.sidebar-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  justify-content: space-between;
+}
+
+.sidebar-button:hover {
+  background: var(--surface-container-high);
+  color: var(--secondary);
+}
+
+.sidebar-button.active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  color: #4f006e;
+  border-color: var(--primary);
+}
+
+/* Main Content */
+.settings-content {
+  background: var(--surface-container);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(70, 71, 82, 0.3);
+  min-height: 500px;
+}
+
+.tab-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 2rem 0;
+  color: var(--on-surface);
+}
+
+/* Settings Groups */
+.settings-group {
+  margin-bottom: 1.75rem;
+}
+
+.settings-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--on-surface);
+  font-size: 0.95rem;
+}
+
+.settings-input,
+.settings-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+  border: 1px solid rgba(70, 71, 82, 0.5);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.settings-input:focus,
+.settings-select:focus {
+  outline: none;
+  border-color: var(--secondary);
+  background: var(--surface-container-low);
+  box-shadow: 0 0 12px rgba(0, 227, 253, 0.2);
+}
+
+.field-hint {
+  font-size: 0.85rem;
+  color: var(--on-surface-variant);
+  margin: 0.5rem 0 0 0;
+}
+
+.static-field {
+  padding: 0.75rem 1rem;
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+  border-radius: 8px;
+  border: 1px solid rgba(70, 71, 82, 0.3);
+}
+
+/* Toggle Group */
+.settings-group.toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--surface-container-low);
+  border-radius: 8px;
+}
+
+.toggle-checkbox {
+  width: 50px;
+  height: 28px;
+  cursor: pointer;
+  accent-color: var(--secondary);
+}
+
+/* Theme & Size Selectors */
+.theme-selector,
+.font-size-selector {
+  display: flex;
+  gap: 1rem;
+}
+
+.theme-btn,
+.size-btn {
+  flex: 1;
+  padding: 0.75rem;
+  background: var(--surface-container-low);
+  color: var(--on-surface-variant);
+  border: 1px solid rgba(70, 71, 82, 0.5);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.theme-btn:hover,
+.size-btn:hover {
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.theme-btn.active,
+.size-btn.active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  color: #4f006e;
+  border-color: var(--primary);
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: rgba(70, 71, 82, 0.3);
+  margin: 2rem 0;
+}
+
+/* Subsection */
+.subsection-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 2rem 0 1.5rem 0;
+  color: var(--on-surface);
+}
+
+.subsection-title.danger {
+  color: var(--error);
+}
+
+/* Buttons */
+.btn-change-password,
+.btn-delete-account,
+.btn-save,
+.btn-cancel {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-change-password {
+  background: linear-gradient(135deg, var(--secondary), rgba(0, 227, 253, 0.8));
+  color: #004d57;
+}
+
+.btn-change-password:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 227, 253, 0.3);
+}
+
+.btn-delete-account {
+  background: rgba(255, 110, 132, 0.2);
+  color: var(--error);
+  border: 1px solid var(--error);
+}
+
+.btn-delete-account:hover {
+  background: rgba(255, 110, 132, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Action Buttons */
+.settings-actions {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 2rem 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, var(--primary), var(--primary-container));
+  color: #4f006e;
+  padding: 0.85rem 2rem;
+}
+
+.btn-save:hover {
+  box-shadow: 0 4px 16px rgba(222, 142, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  border: 1px solid rgba(70, 71, 82, 0.5);
+  padding: 0.85rem 2rem;
+}
+
+.btn-cancel:hover {
+  color: var(--on-surface);
+  border-color: var(--on-surface-variant);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-container {
+    padding-top: 60px;
+  }
+
+  .settings-header {
+    padding: 2rem 1rem;
+  }
+
+  .settings-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .settings-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+
+  .settings-sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    position: static;
+  }
+
+  .sidebar-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .settings-content {
+    padding: 1.5rem;
+  }
+
+  .settings-actions {
+    margin: 2rem auto;
+    padding: 0 1rem 1.5rem;
+    flex-direction: column-reverse;
+  }
+
+  .btn-save,
+  .btn-cancel {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .settings-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-group.toggle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .toggle-checkbox {
+    align-self: flex-end;
+  }
+}
