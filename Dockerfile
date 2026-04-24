@@ -70,4 +70,4 @@ COPY --from=builder /app/backend/scripts ./backend/scripts
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && npx prisma generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]
+CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && node ./backend/node_modules/.bin/prisma generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]
