@@ -46,10 +46,41 @@ export function detectDatabaseType(databaseUrl?: string, dbTypeOverride?: string
   return 'mongodb';
 }
 
+function ensureMongoDatabaseName(databaseUrl: string): string {
+  const trimmed = databaseUrl.trim();
+
+  if (!trimmed.startsWith('mongodb://') && !trimmed.startsWith('mongodb+srv://')) {
+    return trimmed;
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return trimmed;
+  }
+
+  const currentPath = parsed.pathname || '';
+  const hasDatabaseName = currentPath.length > 1;
+
+  if (hasDatabaseName) {
+    return trimmed;
+  }
+
+  const fallbackDatabaseName = (process.env.DATABASE_NAME || 'anistream').trim();
+  parsed.pathname = `/${fallbackDatabaseName || 'anistream'}`;
+  return parsed.toString();
+}
+
 export function getDetectedDatabaseConfig() {
-  const databaseUrl = process.env.DATABASE_URL;
+  const rawDatabaseUrl = process.env.DATABASE_URL;
   const dbTypeOverride = process.env.DB_TYPE;
-  const dbType = detectDatabaseType(databaseUrl, dbTypeOverride);
+  const dbType = detectDatabaseType(rawDatabaseUrl, dbTypeOverride);
+  const databaseUrl = rawDatabaseUrl ? ensureMongoDatabaseName(rawDatabaseUrl) : rawDatabaseUrl;
+
+  if (databaseUrl && rawDatabaseUrl !== databaseUrl) {
+    process.env.DATABASE_URL = databaseUrl;
+  }
 
   return {
     dbType,

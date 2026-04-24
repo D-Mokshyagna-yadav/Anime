@@ -37,6 +37,8 @@ FROM node:20-bookworm-slim AS production
 
 WORKDIR /app
 
+ENV DATABASE_NAME=anistream
+
 # Install curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates openssl && rm -rf /var/lib/apt/lists/*
 
@@ -62,10 +64,6 @@ COPY --from=builder /app/frontend/dist ./frontend/dist
 COPY --from=builder /app/backend/prisma ./backend/prisma
 COPY --from=builder /app/backend/scripts ./backend/scripts
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:5000/api/health || exit 1
-
 EXPOSE 5000
 
-CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && npx prisma generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]
+CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && ./backend/node_modules/.bin/prisma generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]
