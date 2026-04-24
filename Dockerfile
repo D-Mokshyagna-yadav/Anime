@@ -30,9 +30,6 @@ RUN npm rebuild --workspace=frontend
 # Build the project (backend and frontend)
 RUN npm run build
 
-# Remove dev dependencies to reduce image size
-RUN npm prune --omit=dev
-
 FROM node:20-bookworm-slim AS production
 
 WORKDIR /app
@@ -43,6 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certifi
 ENV NODE_ENV=production
 ENV PORT=5000
 
+# Copy all node_modules (dotenv is needed at runtime)
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/frontend/dist ./frontend/dist
