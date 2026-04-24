@@ -18,11 +18,14 @@ COPY . .
 # Install all dependencies for root, backend, and frontend workspaces
 RUN npm ci
 
-# Install native bindings explicitly
-RUN npm install --workspace=frontend --no-save @rolldown/binding-linux-x64-gnu@1.0.0-rc.16 lightningcss-linux-x64-gnu@1.32.0
+# Install all native bindings explicitly
+RUN npm install --workspace=frontend --no-save \
+    @rolldown/binding-linux-x64-gnu@1.0.0-rc.16 \
+    lightningcss-linux-x64-gnu@1.32.0 \
+    @tailwindcss/oxide-linux-x64-gnu
 
-# Reinstall rolldown and vite to ensure they find the native bindings
-RUN npm install --workspace=frontend --force rolldown@latest vite
+# Rebuild native modules to ensure they're properly linked
+RUN npm rebuild --workspace=frontend
 
 # Build the project (backend and frontend)
 RUN npm run build
