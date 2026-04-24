@@ -65,7 +65,7 @@ export default function RegisterPage() {
         </Link>
 
         <h1 className="auth-title">Create account</h1>
-        <p className="auth-sub">Join AniStream and start watching</p>
+        <p className="auth-sub">Join SensuiWatch and start watching</p>
 
         <form onSubmit={handleSubmit} className="auth-form">
           {error && (

@@ -3,8 +3,8 @@
   text-decoration: none; 
   flex-shrink: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  width: 100%;
-  min-width: 0;
+  width: var(--anime-card-width);
+  min-width: var(--anime-card-width);
 }
 .card-link:active {
   transform: translateY(-2px);
@@ -25,11 +25,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: var(--anime-card-ratio);
 }
 
+.card-link.small,
 .card-link.small .card-poster {
-  aspect-ratio: 7 / 10;
+  width: var(--anime-card-width);
+  min-width: var(--anime-card-width);
+  aspect-ratio: var(--anime-card-ratio);
 }
 .card-poster img {
   width: 100%; 
@@ -45,11 +48,11 @@
 .card-overlay {
   position: absolute; 
   inset: 0;
-  background: rgba(0,0,0,0);
+  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.62) 100%);
   display: flex; 
   align-items: center; 
   justify-content: center;
-  transition: background 0.25s ease;
+  transition: background 0.25s ease, opacity 0.25s ease;
 }
 @media (min-width: 768px) {
   .anime-card:hover .card-overlay { 
@@ -127,6 +130,8 @@
   display: flex; 
   flex-direction: column; 
   gap: 4px;
+  min-height: var(--anime-card-info-height);
+  max-height: var(--anime-card-info-height);
 }
 
 .card-link:focus-visible {
@@ -148,6 +153,8 @@ body.device-tv .card-title {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical; 
   overflow: hidden;
+  min-height: 2.7em;
+  max-height: 2.7em;
 }
 .card-score {
   display: inline-flex; 

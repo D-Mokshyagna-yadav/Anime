@@ -1,0 +1,69 @@
+.category-main {
+  padding-top: 110px;
+  padding-bottom: 56px;
+}
+
+.category-header {
+  margin-bottom: 16px;
+}
+
+.category-header h1 {
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+}
+
+.category-header p {
+  color: var(--text-faint);
+  margin-top: 6px;
+}
+
+.category-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 18px;
+}
+
+.category-chip {
+  border: 1px solid var(--outline);
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border-radius: 999px;
+  padding: 8px 12px;
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+.category-chip.active {
+  background: rgba(124, 58, 237, 0.2);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--anime-card-width));
+  justify-content: center;
+  gap: 18px;
+}
+
+.pagination {
+  margin-top: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.page-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--outline);
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.page-label {
+  color: var(--text-faint);
+}

@@ -41,7 +41,7 @@ const ProfilePage: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setPageMeta('Profile', 'View and manage your AniStream profile, watchlist, and reviews.');
+    setPageMeta('Profile', 'View and manage your SensuiWatch profile, watchlist, and reviews.');
     
     if (!isAuthenticated) {
       navigate('/login');

@@ -42,61 +42,34 @@
 
 .popular-grid {
   display: grid;
-  grid-template-columns: repeat(var(--adaptive-grid-columns), minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, var(--anime-card-width));
   gap: 12px;
+  justify-content: center;
 }
 @media (min-width: 480px) {
   .popular-grid {
-    grid-template-columns: repeat(var(--adaptive-grid-columns), minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, var(--anime-card-width));
     gap: 14px;
   }
 }
 @media (min-width: 768px) {
   .popular-grid {
-    grid-template-columns: repeat(var(--adaptive-grid-columns), minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, var(--anime-card-width));
     gap: 24px;
   }
 }
 @media (min-width: 1024px) {
   .popular-grid {
-    grid-template-columns: repeat(var(--adaptive-grid-columns), minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, var(--anime-card-width));
     gap: 24px;
-  }
-}
-
-@container (max-width: 768px) {
-  .popular-grid {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 12px;
-  }
-}
-
-@container (min-width: 769px) and (max-width: 1024px) {
-  .popular-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container (min-width: 1025px) and (max-width: 1920px) {
-  .popular-grid {
-    grid-template-columns: repeat(min(6, var(--adaptive-grid-columns)), minmax(0, 1fr));
-  }
-}
-
-@container (min-width: 1921px) {
-  .popular-grid {
-    grid-template-columns: repeat(var(--adaptive-grid-columns), minmax(0, 1fr));
-    gap: clamp(16px, 1.2vw, 28px);
   }
 }
 
 /* Continue Watching Cards */
 .continue-card-wrapper {
   flex-shrink: 0;
-  width: clamp(180px, 28vw, 280px);
+  width: var(--anime-card-width);
 }
-@media (min-width: 480px) { .continue-card-wrapper { width: 200px; } }
-@media (min-width: 768px) { .continue-card-wrapper { width: 220px; } }
 
 .continue-card {
   display: block;
@@ -207,8 +180,12 @@
 .footer-links a:hover { color: var(--primary-dim); }
 
 @media (max-width: 600px) {
-  .popular-grid { grid-template-columns: repeat(1, 1fr); gap: 12px; }
+  .popular-grid { grid-template-columns: repeat(auto-fill, var(--anime-card-width)); gap: 12px; }
   .footer-inner { flex-direction: column; gap: 12px; text-align: center; }
+}
+
+.anime-row-scroll .anime-scroll-item {
+  width: var(--anime-card-width);
 }
 
 body.device-mobile .home-main {

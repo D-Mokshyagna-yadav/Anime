@@ -2,12 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import http from 'http';
+import { WebSocketServer } from 'ws';
 import animeRouter from './routes/anime';
 import userRouter from './routes/user';
 import { connectPrismaWithRetry, registerPrismaShutdownHooks } from './lib/prisma';
+import { runNotificationSweep } from './services/notificationService';
+import { attachNotificationWebSocket, publishNewNotifications } from './services/realtimeNotificationService';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const NOTIFICATION_SWEEP_INTERVAL_MS = 5 * 60 * 1000;
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -73,9 +78,30 @@ async function bootstrap() {
     await connectPrismaWithRetry();
     registerPrismaShutdownHooks();
 
-    app.listen(PORT, () => {
-      console.log(`🚀 AniStream backend running at http://localhost:${PORT}`);
+    const server = http.createServer(app);
+    const wss = new WebSocketServer({ server, path: '/api/user/notifications/ws' });
+    attachNotificationWebSocket(wss);
+
+    server.listen(PORT, () => {
+      console.log(`🚀 SensuiWatch backend running at http://localhost:${PORT}`);
     });
+
+    const sweepNotifications = async () => {
+      try {
+        const result = await runNotificationSweep();
+        if (result.created > 0) {
+          publishNewNotifications(result.createdNotifications);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(`[notifications] Sweep failed: ${message}`);
+      }
+    };
+
+    void sweepNotifications();
+    setInterval(() => {
+      void sweepNotifications();
+    }, NOTIFICATION_SWEEP_INTERVAL_MS);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[startup] Failed to initialize backend: ${message}`);

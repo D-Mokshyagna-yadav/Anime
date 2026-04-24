@@ -1,6 +1,6 @@
 export function setPageMeta(title: string, description: string, image?: string) {
   // Update document title
-  document.title = `${title} | AniStream`;
+  document.title = `${title} | SensuiWatch`;
 
   // Update or create meta description
   let descMeta = document.querySelector('meta[name="description"]');
@@ -28,5 +28,5 @@ function updateOGTag(property: string, content: string) {
 }
 
 export function clearPageMeta() {
-  document.title = 'AniStream';
+  document.title = 'SensuiWatch';
 }

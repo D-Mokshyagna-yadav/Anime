@@ -82,7 +82,7 @@ const SettingsPage: React.FC = () => {
   const [error, setError] = useState('');
 
   React.useEffect(() => {
-    setPageMeta('Settings', 'Manage your AniStream account settings and preferences.');
+    setPageMeta('Settings', 'Manage your SensuiWatch account settings and preferences.');
 
     if (!isAuthenticated) {
       navigate('/login');

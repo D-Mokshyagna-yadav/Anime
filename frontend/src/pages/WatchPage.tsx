@@ -16,6 +16,7 @@ import {
 import { getEpisodeCountLabel, getExpectedEpisodeCount } from '../utils/anime';
 import { buildEpisodePlaceholders, getEpisodeLookupParams } from '../utils/episodes';
 import { applyImageFallback, getAnimeThumbImage } from '../utils/images';
+import { logError } from '../utils/logger';
 import './WatchPage.css';
 
 interface Episode {
@@ -246,7 +247,10 @@ export default function WatchPage() {
             }
           });
       })
-      .catch(() => setError('Failed to load anime details.'))
+      .catch((requestError) => {
+        logError('WatchPlayer', requestError, { animeId });
+        setError('Failed to load anime details.');
+      })
       .finally(() => setLoading(false));
   }, [animeId]);
 
@@ -280,7 +284,8 @@ export default function WatchPage() {
 
         setEmbedUrl(nextEmbedUrl);
       })
-      .catch(() => {
+      .catch((requestError) => {
+        logError('WatchPlayer', requestError, { provider: 'megaplay', animeId, episode: currentEpNum });
         setPlayerError('Failed to load the embedded player. Try Direct stream.');
       })
       .finally(() => setLoading(false));
@@ -311,7 +316,8 @@ export default function WatchPage() {
           setError('No playable direct sources were found. Try MegaPlay.');
         }
       })
-      .catch(() => {
+      .catch((requestError) => {
+        logError('WatchPlayer', requestError, { provider: 'direct', animeId, episode: currentEpNum });
         setError('Failed to load the direct stream. Try MegaPlay or another episode.');
       })
       .finally(() => setLoading(false));
@@ -471,7 +477,10 @@ export default function WatchPage() {
                   autoPlay={deviceType !== 'desktop'}
                   aria-label={`Direct stream player for ${title} episode ${currentEpNum}`}
                   style={{ display: loading || error ? 'none' : 'block' }}
-                  onError={() => setError('Video playback failed. Try MegaPlay.')}
+                  onError={() => {
+                    logError('WatchPlayer', 'video-playback-failed', { sourceCount: sources.length, quality });
+                    setError('Video playback failed. Try MegaPlay.');
+                  }}
                 />
               </>
             )}

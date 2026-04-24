@@ -1,0 +1,86 @@
+.notifications-main {
+  padding-top: 110px;
+  padding-bottom: 56px;
+}
+
+.notifications-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.notifications-page-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(1.3rem, 2.1vw, 1.9rem);
+}
+
+.notifications-page-header p {
+  color: var(--text-faint);
+  margin-top: 6px;
+}
+
+.notifications-page-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.notifications-page-actions .danger {
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+
+.notifications-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification-row {
+  min-height: 68px;
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  text-align: left;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.notification-row.unread {
+  border-color: rgba(124, 58, 237, 0.45);
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.notification-row .title {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.notification-row .episode,
+.notification-row .time {
+  font-size: 0.88rem;
+  color: var(--text-faint);
+}
+
+.notifications-empty-page,
+.notifications-loading {
+  padding: 26px;
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-faint);
+}
+
+@media (max-width: 768px) {
+  .notifications-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

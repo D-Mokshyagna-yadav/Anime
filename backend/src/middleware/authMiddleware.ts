@@ -18,7 +18,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { id: string; email: string };
+    const decoded = verifyAuthToken(token);
     req.userId = decoded.id;
     req.user = decoded;
     next();
@@ -26,6 +26,9 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     return res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }
 };
+
+export const verifyAuthToken = (token: string) =>
+  jwt.verify(token, process.env.JWT_SECRET || 'secret') as { id: string; email: string };
 
 export const generateToken = (id: string, email: string): string => {
   const secret = process.env.JWT_SECRET || 'secret';

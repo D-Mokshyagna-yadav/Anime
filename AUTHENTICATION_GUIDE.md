@@ -1,4 +1,4 @@
-# AniStream - Authentication & Feature Access Guide
+# SensuiWatch - Authentication & Feature Access Guide
 
 **Date:** April 23, 2026  
 **Status:** All TypeScript Errors Fixed ✅
@@ -9,7 +9,7 @@
 
 ### Two-Tier Access System
 
-AniStream supports **two types of users:**
+SensuiWatch supports **two types of users:**
 
 1. **Guest/Anonymous Users** - Can watch anime without creating an account
 2. **Authenticated Users** - Full access including watch history, watchlist, and reviews

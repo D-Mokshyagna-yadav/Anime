@@ -1,4 +1,4 @@
-# 🎬 AniStream - Session Complete Summary
+# 🎬 SensuiWatch - Session Complete Summary
 
 **Session Status**: ✅ **COMPLETE**  
 **Date**: 2024  
@@ -104,7 +104,7 @@ Return cached response or error
 
 **Current Status** (Confirmed):
 ```
-[API] 🚀 AniStream backend running at http://localhost:5000
+[API] 🚀 SensuiWatch backend running at http://localhost:5000
 [WEB] ➜  Local:   http://localhost:5174/
 [WEB]   VITE v8.0.9 ready in 2098 ms
 ```

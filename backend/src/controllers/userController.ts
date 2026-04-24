@@ -14,6 +14,12 @@ import {
   upsertWatchlist,
   verifyUserCredentials,
 } from '../services/userService';
+import {
+  clearAllNotifications,
+  listNotificationsForUser,
+  markAllNotificationsSeen,
+  markNotificationSeen,
+} from '../services/notificationService';
 
 const getRequiredUserId = (req: Request) => req.userId;
 
@@ -37,8 +43,17 @@ export async function signup(req: Request, res: Response) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
+    console.error('[auth] signup failed:', message);
+
     if (message.includes('P2002') || message.toLowerCase().includes('unique constraint') || message.toLowerCase().includes('duplicate')) {
       return res.status(409).json({ success: false, message: 'User already exists' });
+    }
+
+    if (message.toLowerCase().includes('empty database name not allowed')) {
+      return res.status(503).json({
+        success: false,
+        message: 'Service is temporarily unavailable due to database configuration. Please try again shortly.',
+      });
     }
 
     return res.status(500).json({ success: false, message: 'Registration failed. Please try again.' });
@@ -229,6 +244,69 @@ export async function updateUserProfile(req: Request, res: Response) {
       const status = message.includes('Invalid current password') || message.includes('Current password required') ? 401 : 400;
       return res.status(status).json({ success: false, message });
     }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: String(error) });
+  }
+}
+
+export async function listNotifications(req: Request, res: Response) {
+  try {
+    const userId = getRequiredUserId(req);
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    const limit = req.query.limit ? Number(req.query.limit) : 25;
+    const result = await listNotificationsForUser(userId, limit);
+
+    return res.json({
+      success: true,
+      notifications: result.notifications,
+      unreadCount: result.unreadCount,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: String(error) });
+  }
+}
+
+export async function setNotificationSeen(req: Request, res: Response) {
+  try {
+    const userId = getRequiredUserId(req);
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    const notificationId = String(req.params.notificationId || '');
+    if (!notificationId) {
+      return res.status(400).json({ success: false, message: 'notificationId required' });
+    }
+
+    const updated = await markNotificationSeen(userId, notificationId);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Notification not found' });
+    }
+
+    return res.json({ success: true, notification: updated });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: String(error) });
+  }
+}
+
+export async function setAllNotificationsSeen(req: Request, res: Response) {
+  try {
+    const userId = getRequiredUserId(req);
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    const result = await markAllNotificationsSeen(userId);
+    return res.json({ success: true, updated: result.updated });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: String(error) });
+  }
+}
+
+export async function removeAllNotifications(req: Request, res: Response) {
+  try {
+    const userId = getRequiredUserId(req);
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    const result = await clearAllNotifications(userId);
+    return res.json({ success: true, removed: result.removed });
   } catch (error) {
     return res.status(500).json({ success: false, message: String(error) });
   }

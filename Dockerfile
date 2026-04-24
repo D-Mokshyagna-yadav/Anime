@@ -37,7 +37,7 @@ FROM node:20-bookworm-slim AS production
 
 WORKDIR /app
 
-ENV DATABASE_NAME=anistream
+ENV DATABASE_NAME=SensuiWatch
 
 # Install curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates openssl && rm -rf /var/lib/apt/lists/*

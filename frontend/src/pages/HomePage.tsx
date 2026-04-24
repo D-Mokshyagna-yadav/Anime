@@ -5,7 +5,9 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import AnimeCard from '../components/AnimeCard';
+import HorizontalScroller from '../components/HorizontalScroller';
 import '../components/AnimeCard.css';
+import '../components/HorizontalScroller.css';
 import { fetchTrending, fetchPopular, fetchSeasonal } from '../api/client';
 import type { AniMedia } from '../api/client';
 import { DEFAULT_ANIME_IMAGE, applyImageFallback } from '../utils/images';
@@ -15,8 +17,8 @@ import './HomePage.css';
 interface WatchHistoryItem { animeId: number; episodeId: string; episodeNum: number; title: string; thumb: string; timestamp: number; duration: number; currentTime: number; }
 
 const SkeletonCard = () => (
-  <div style={{ width: 175, flexShrink: 0 }}>
-    <div className="skeleton" style={{ height: 250, borderRadius: 12 }} />
+  <div style={{ width: 'var(--anime-card-width)', flexShrink: 0 }}>
+    <div className="skeleton" style={{ aspectRatio: '2 / 3', borderRadius: 12 }} />
     <div className="skeleton" style={{ height: 14, marginTop: 10, borderRadius: 6, width: '80%' }} />
     <div className="skeleton" style={{ height: 12, marginTop: 6, borderRadius: 6, width: '50%' }} />
   </div>
@@ -34,7 +36,7 @@ export default function HomePage() {
   useEffect(() => {
     setPageMeta(
       'Home - Discover Anime',
-      'Watch anime for free with AniStream. Discover trending, popular, and seasonal anime.'
+      'Watch anime for free with SensuiWatch. Discover trending, popular, and seasonal anime.'
     );
   }, []);
 
@@ -102,7 +104,7 @@ export default function HomePage() {
               <h2 className="section-title">Continue Watching</h2>
               <a href="/" className="see-all">View All <ChevronRight size={16} /></a>
             </div>
-            <div className="h-scroll">
+            <HorizontalScroller ariaLabel="Continue watching list" className="continue-scroll">
               {watchHistory.map((item, i) => (
                 <motion.div 
                   key={item.animeId} 
@@ -129,7 +131,7 @@ export default function HomePage() {
                   </Link>
                 </motion.div>
               ))}
-            </div>
+            </HorizontalScroller>
           </section>
         )}
 
@@ -139,16 +141,16 @@ export default function HomePage() {
             <h2 className="section-title">Trending Now</h2>
             <a href="/search?sort=trending" className="see-all">See All <ChevronRight size={16} /></a>
           </div>
-          <div className="h-scroll">
+          <HorizontalScroller ariaLabel="Trending anime" className="anime-row-scroll">
             {loading
               ? Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />)
               : trending.map((a, i) => (
-                <motion.div key={a.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                <motion.div key={a.id} className="anime-scroll-item" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                   <AnimeCard anime={a} />
                 </motion.div>
               ))
             }
-          </div>
+          </HorizontalScroller>
         </section>
 
         {/* Popular This Season */}
@@ -175,16 +177,16 @@ export default function HomePage() {
             <h2 className="section-title">Currently Airing</h2>
             <a href="/season" className="see-all">See All <ChevronRight size={16} /></a>
           </div>
-          <div className="h-scroll">
+          <HorizontalScroller ariaLabel="Currently airing anime" className="anime-row-scroll">
             {loading
               ? Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />)
               : airing.slice(0, 12).map((a, i) => (
-                <motion.div key={a.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+                <motion.div key={a.id} className="anime-scroll-item" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
                   <AnimeCard anime={a} />
                 </motion.div>
               ))
             }
-          </div>
+          </HorizontalScroller>
         </section>
 
         {/* Recommended (Top Rated) */}
@@ -211,16 +213,16 @@ export default function HomePage() {
             <h2 className="section-title">Top Airing Anime</h2>
             <a href="/season" className="see-all">See All <ChevronRight size={16} /></a>
           </div>
-          <div className="h-scroll">
+          <HorizontalScroller ariaLabel="Top airing anime" className="anime-row-scroll">
             {loading
               ? Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />)
               : topAiring.slice(0, 12).map((a, i) => (
-                <motion.div key={a.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
+                <motion.div key={a.id} className="anime-scroll-item" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
                   <AnimeCard anime={a} />
                 </motion.div>
               ))
             }
-          </div>
+          </HorizontalScroller>
         </section>
 
       </main>
@@ -228,7 +230,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="footer">
         <div className="container footer-inner">
-          <span>© 2025 AniStream — Anime Streaming Platform</span>
+          <span>© 2025 SensuiWatch — Anime Streaming Platform</span>
           <div className="footer-links">
             <a href="#">About</a>
             <a href="#">Contact</a>

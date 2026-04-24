@@ -33,6 +33,21 @@
   --space-2: clamp(0.65rem, 0.55rem + 0.4vw, 1rem);
   --space-3: clamp(0.9rem, 0.75rem + 0.5vw, 1.35rem);
   --space-4: clamp(1.1rem, 0.9rem + 0.8vw, 2rem);
+  --anime-card-width: 240px;
+  --anime-card-ratio: 2 / 3;
+  --anime-card-info-height: 86px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --anime-card-width: 150px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --anime-card-width: 200px;
+  }
 }
 
 html { scroll-behavior: smooth; }
@@ -52,9 +67,12 @@ img { display: block; max-width: 100%; }
 button { cursor: pointer; border: none; outline: none; font-family: inherit; }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-low); }
-::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 99px; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3a3645, #282530);
+  border-radius: 99px;
+}
 
 /* Utility */
 .container { max-width: var(--layout-max); margin: 0 auto; padding: 0 var(--space-3); }
@@ -106,6 +124,7 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  width: var(--anime-card-width);
 }
 .anime-card:hover {
   transform: translateY(-4px) scale(1.01);
@@ -156,10 +175,22 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
 
 /* Horizontal scroll row */
 .h-scroll {
-  display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 10px;
   scrollbar-width: thin;
+  scroll-snap-type: x mandatory;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
 }
-.h-scroll::-webkit-scrollbar { height: 4px; }
+.h-scroll > * {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+}
+
+.h-scroll::-webkit-scrollbar { height: 6px; }
 
 .route-loader {
   min-height: 100vh;
@@ -204,9 +235,11 @@ body.device-tv .container {
 body.device-tv .h-scroll {
   overflow: visible;
   display: grid;
-  grid-template-columns: repeat(var(--adaptive-grid-columns), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--adaptive-grid-columns), var(--anime-card-width));
   gap: var(--space-3);
   padding-bottom: 0;
+  justify-content: start;
+  scroll-snap-type: none;
 }
 
 body.device-tv .h-scroll > * {

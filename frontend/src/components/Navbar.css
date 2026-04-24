@@ -318,6 +318,27 @@
   box-shadow: 20px 0 60px rgba(0, 0, 0, 0.4);
 }
 
+.drawer-close-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  min-height: 42px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.drawer-close-link:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .left-rail-brand {
   display: flex;
   align-items: center;

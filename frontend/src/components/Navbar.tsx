@@ -280,7 +280,7 @@ export default function Navbar() {
             {drawerOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <Link to="/" className="navbar-logo" aria-label="AniStream Home">
+          <Link to="/" className="navbar-logo" aria-label="SensuiWatch Home">
             <Tv2 size={26} color="var(--primary)" strokeWidth={2.5} />
             <span>Ani<strong>Stream</strong></span>
           </Link>
@@ -404,8 +404,18 @@ export default function Navbar() {
             onClick={() => setDrawerOpen(false)}
           />
           <aside className="left-rail mobile-drawer" aria-label="Sidebar navigation" ref={drawerRef}>
+          <button
+            type="button"
+            className="drawer-close-link"
+            aria-label="Close menu"
+            onClick={() => setDrawerOpen(false)}
+          >
+            <X size={16} />
+            <span>Close menu</span>
+          </button>
+
           <div className="left-rail-brand">
-            <Tv2 size={24} color="var(--primary-dim)" />
+            <Tv2 size={20} color="var(--primary-dim)" />
             <span>Browse</span>
           </div>
 
@@ -421,7 +431,15 @@ export default function Navbar() {
               <h4>Categories</h4>
               <div className="drawer-categories-list">
                 {genres.map((genre) => (
-                  <button key={genre} className="drawer-category-btn" onClick={() => { setDrawerOpen(false); navigate(`/categories/${encodeURIComponent(genre)}`); }}>
+                  <button
+                    key={genre}
+                    type="button"
+                    className="drawer-category-btn"
+                    onClick={() => {
+                      setDrawerOpen(false);
+                      navigate(`/categories/${encodeURIComponent(genre)}`);
+                    }}
+                  >
                     {genre}
                   </button>
                 ))}

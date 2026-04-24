@@ -14,7 +14,7 @@ const DEFAULT_ANIME_IMAGE = `data:image/svg+xml;charset=UTF-8,${encodeURICompone
     <rect x="48" y="48" width="504" height="804" rx="28" fill="url(#bg)"/>
     <circle cx="300" cy="310" r="92" fill="#f5f3ff" fill-opacity="0.18"/>
     <path d="M232 430h136c35.346 0 64 28.654 64 64v58H168v-58c0-35.346 28.654-64 64-64Z" fill="#f5f3ff" fill-opacity="0.18"/>
-    <text x="300" y="660" text-anchor="middle" fill="#f5f3ff" font-family="Arial, sans-serif" font-size="42" font-weight="700">AniStream</text>
+    <text x="300" y="660" text-anchor="middle" fill="#f5f3ff" font-family="Arial, sans-serif" font-size="42" font-weight="700">SensuiWatch</text>
     <text x="300" y="710" text-anchor="middle" fill="#e9d5ff" font-family="Arial, sans-serif" font-size="28">Image unavailable</text>
   </svg>`
 )}`;
@@ -50,6 +50,8 @@ const MEDIA_FIELDS = `
   id idMal title { romaji english native }
   coverImage { extraLarge large medium color }
   bannerImage description(asHtml: false)
+  isAdult
+  tags { name rank isMediaSpoiler }
   genres averageScore popularity
   status season seasonYear episodes duration
   studios(isMain: true) { nodes { name } }
@@ -62,6 +64,8 @@ const MEDIA_FIELDS_WITH_SCHEDULE = `
   id idMal title { romaji english native }
   coverImage { extraLarge large medium color }
   bannerImage description(asHtml: false)
+  isAdult
+  tags { name rank isMediaSpoiler }
   genres averageScore popularity
   status season seasonYear episodes duration
   studios(isMain: true) { nodes { name } }
@@ -74,22 +78,27 @@ const MEDIA_FIELDS_WITH_SCHEDULE = `
 `;
 
 export const getTrending = async (page = 1, perPage = 20) =>
-  query<AniListPage>(`query($page:Int,$perPage:Int){Page(page:$page,perPage:$perPage){media(sort:TRENDING_DESC,type:ANIME){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { page, perPage });
+  query<AniListPage>(`query($page:Int,$perPage:Int){Page(page:$page,perPage:$perPage){media(sort:TRENDING_DESC,type:ANIME,isAdult:false,genre_not_in:[\"Hentai\"],tag_not_in:[\"Hentai\",\"Adult Content\",\"NSFW\"]){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { page, perPage });
 
 export const getPopular = async (page = 1, perPage = 20) =>
-  query<AniListPage>(`query($page:Int,$perPage:Int){Page(page:$page,perPage:$perPage){media(sort:POPULARITY_DESC,type:ANIME){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { page, perPage });
+  query<AniListPage>(`query($page:Int,$perPage:Int){Page(page:$page,perPage:$perPage){media(sort:POPULARITY_DESC,type:ANIME,isAdult:false,genre_not_in:[\"Hentai\"],tag_not_in:[\"Hentai\",\"Adult Content\",\"NSFW\"]){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { page, perPage });
 
 export const getSeasonalAnime = async (season: string, year: number, page = 1) =>
-  query<AniListPage>(`query($season:MediaSeason,$year:Int,$page:Int){Page(page:$page,perPage:20){media(season:$season,seasonYear:$year,type:ANIME,sort:POPULARITY_DESC){${MEDIA_FIELDS_WITH_SCHEDULE}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { season, year, page });
+  query<AniListPage>(`query($season:MediaSeason,$year:Int,$page:Int){Page(page:$page,perPage:20){media(season:$season,seasonYear:$year,type:ANIME,isAdult:false,genre_not_in:[\"Hentai\"],tag_not_in:[\"Hentai\",\"Adult Content\",\"NSFW\"],sort:POPULARITY_DESC){${MEDIA_FIELDS_WITH_SCHEDULE}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { season, year, page });
 
 export const getAnimeById = async (id: number) =>
   query<{ Media: AniListMedia }>(`query($id:Int){Media(id:$id,type:ANIME){${MEDIA_FIELDS_WITH_SCHEDULE} characters(role:MAIN,perPage:8){nodes{id name{full}image{medium}}} relations{edges{relationType node{id title{romaji}coverImage{medium}type}}}}}`, { id });
 
 export const searchAnime = async (search: string, page = 1, genres?: string[], status?: string) =>
-  query<AniListPage>(`query($search:String,$page:Int,$genres:[String],$status:MediaStatus){Page(page:$page,perPage:24){media(search:$search,type:ANIME,genre_in:$genres,status:$status){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { search, page, genres, status });
+  query<AniListPage>(`query($search:String,$page:Int,$genres:[String],$status:MediaStatus){Page(page:$page,perPage:24){media(search:$search,type:ANIME,isAdult:false,genre_in:$genres,genre_not_in:[\"Hentai\"],tag_not_in:[\"Hentai\",\"Adult Content\",\"NSFW\"],status:$status){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { search, page, genres, status });
 
 export const getRecentlyUpdated = async (page = 1, perPage = 20) =>
-  query<AniListPage>(`query($page:Int,$perPage:Int){Page(page:$page,perPage:$perPage){media(type:ANIME,sort:UPDATED_AT_DESC,status:RELEASING){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { page, perPage });
+  query<AniListPage>(`query($page:Int,$perPage:Int){Page(page:$page,perPage:$perPage){media(type:ANIME,isAdult:false,genre_not_in:[\"Hentai\"],tag_not_in:[\"Hentai\",\"Adult Content\",\"NSFW\"],sort:UPDATED_AT_DESC,status:RELEASING){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { page, perPage });
+
+export const getGenreCollection = async () => {
+  const data = await query<{ GenreCollection: string[] }>('query { GenreCollection }');
+  return (data.GenreCollection || []).filter((genre) => !hasBlockedTerm(genre));
+};
 
 export interface AniListMedia {
   id: number;
@@ -98,6 +107,8 @@ export interface AniListMedia {
   coverImage: { extraLarge: string; large: string; medium: string; color: string };
   bannerImage: string;
   description: string;
+  isAdult?: boolean;
+  tags?: { name: string; rank?: number; isMediaSpoiler?: boolean }[];
   genres: string[];
   averageScore: number;
   popularity: number;
@@ -114,6 +125,30 @@ export interface AniListMedia {
     pageInfo: { hasNextPage: boolean };
   };
 }
+
+const BLOCKED_TERMS = ['hentai', 'adult', 'nsfw', 'explicit', 'porn'];
+
+const hasBlockedTerm = (value?: string) => {
+  if (!value) return false;
+  const normalized = value.toLowerCase();
+  return BLOCKED_TERMS.some((term) => normalized.includes(term));
+};
+
+export const isSafeAnime = (media: AniListMedia): boolean => {
+  if (media.isAdult === true) {
+    return false;
+  }
+
+  if ((media.genres || []).some((genre) => hasBlockedTerm(genre))) {
+    return false;
+  }
+
+  if ((media.tags || []).some((tag) => hasBlockedTerm(tag.name))) {
+    return false;
+  }
+
+  return true;
+};
 
 /**
  * Ensure coverImage has valid fallback sources

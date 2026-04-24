@@ -33,7 +33,7 @@ const SeasonPage: React.FC = () => {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   useEffect(() => {
-    setPageMeta('Anime Calendar', 'Browse anime by season and release schedule on AniStream.');
+    setPageMeta('Anime Calendar', 'Browse anime by season and release schedule on SensuiWatch.');
     loadCalendar();
   }, [season, year]);
 

@@ -15,6 +15,8 @@ const RecommendationsPage = lazy(() => import('./pages/RecommendationsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const ContinueWatchingPage = lazy(() => import('./pages/ContinueWatchingPage'));
 const SeasonPage = lazy(() => import('./pages/SeasonPage'));
+const CategoryPage = lazy(() => import('./pages/CategoryPage'));
+const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 
 export default function App() {
   return (
@@ -32,6 +34,9 @@ export default function App() {
             <Route path="/recommendations" element={<RecommendationsPage />} />
             <Route path="/continue-watching" element={<ContinueWatchingPage />} />
             <Route path="/season" element={<SeasonPage />} />
+            <Route path="/categories" element={<CategoryPage />} />
+            <Route path="/categories/:genre" element={<CategoryPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Routes>

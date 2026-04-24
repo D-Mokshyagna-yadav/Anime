@@ -20,12 +20,19 @@ interface StreamSourceLike {
 }
 
 const hydrateAnime = (anime: anilist.AniListMedia) => {
+  if (!anilist.isSafeAnime(anime)) {
+    return null;
+  }
+
   const validAnime = anilist.ensureValidCoverImage(anime);
   return {
     ...validAnime,
     airedEpisodes: anilist.calculateAiredEpisodes(validAnime),
   };
 };
+
+const hydrateSafeMediaList = (media: anilist.AniListMedia[]) =>
+  media.map(hydrateAnime).filter((item): item is NonNullable<ReturnType<typeof hydrateAnime>> => Boolean(item));
 
 const parseEpisodeNumber = (value: unknown): number | null => {
   const parsed = Number(value);
@@ -203,7 +210,7 @@ router.get('/trending', async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
     const data = await anilist.getTrending(page);
-    const mediaWithAiredEps = data.Page.media.map(hydrateAnime);
+    const mediaWithAiredEps = hydrateSafeMediaList(data.Page.media);
     res.json({ success: true, data: { ...data.Page, media: mediaWithAiredEps } });
   } catch (e) {
     res.status(500).json({ success: false, message: String(e) });
@@ -215,7 +222,7 @@ router.get('/latest', async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
     const data = await anilist.getRecentlyUpdated(page);
-    const mediaWithAiredEps = data.Page.media.map(hydrateAnime);
+    const mediaWithAiredEps = hydrateSafeMediaList(data.Page.media);
     res.json({ success: true, data: { ...data.Page, media: mediaWithAiredEps } });
   } catch (e) {
     res.status(500).json({ success: false, message: String(e) });
@@ -227,7 +234,7 @@ router.get('/popular', async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
     const data = await anilist.getPopular(page);
-    const mediaWithAiredEps = data.Page.media.map(hydrateAnime);
+    const mediaWithAiredEps = hydrateSafeMediaList(data.Page.media);
     res.json({ success: true, data: { ...data.Page, media: mediaWithAiredEps } });
   } catch (e) {
     res.status(500).json({ success: false, message: String(e) });
@@ -241,7 +248,7 @@ router.get('/seasonal', async (req: Request, res: Response) => {
     const year = Number(req.query.year) || new Date().getFullYear();
     const page = Number(req.query.page) || 1;
     const data = await anilist.getSeasonalAnime(season, year, page);
-    const mediaWithAiredEps = data.Page.media.map(hydrateAnime);
+    const mediaWithAiredEps = hydrateSafeMediaList(data.Page.media);
     res.json({ success: true, data: { ...data.Page, media: mediaWithAiredEps } });
   } catch (e) {
     res.status(500).json({ success: false, message: String(e) });
@@ -256,8 +263,18 @@ router.get('/search', async (req: Request, res: Response) => {
     const genres = req.query.genre ? [String(req.query.genre)] : undefined;
     const status = req.query.status ? String(req.query.status) : undefined;
     const data = await anilist.searchAnime(q, page, genres, status);
-    const mediaWithAiredEps = data.Page.media.map(hydrateAnime);
+    const mediaWithAiredEps = hydrateSafeMediaList(data.Page.media);
     res.json({ success: true, data: { ...data.Page, media: mediaWithAiredEps } });
+  } catch (e) {
+    res.status(500).json({ success: false, message: String(e) });
+  }
+});
+
+// GET /api/anime/genres
+router.get('/genres', async (_req: Request, res: Response) => {
+  try {
+    const genres = await anilist.getGenreCollection();
+    res.json({ success: true, data: genres });
   } catch (e) {
     res.status(500).json({ success: false, message: String(e) });
   }
@@ -284,6 +301,8 @@ router.get('/calendar', async (req: Request, res: Response) => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     data.Page.media.forEach((anime) => {
+      if (!anilist.isSafeAnime(anime)) return;
+
       const validAnime = anilist.ensureValidCoverImage(anime);
       if (validAnime.status !== 'RELEASING') return;
 
@@ -331,6 +350,10 @@ router.get('/:id', async (req: Request, res: Response) => {
     }
 
     const data = await anilist.getAnimeById(id);
+    if (!anilist.isSafeAnime(data.Media)) {
+      return res.status(404).json({ success: false, message: 'Anime not available' });
+    }
+
     const media = hydrateAnime(data.Media);
 
     return res.json({

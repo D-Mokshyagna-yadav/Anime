@@ -1,4 +1,4 @@
-# AniStream - Manual Testing Guide
+# SensuiWatch - Manual Testing Guide
 
 ## Pre-Testing Checklist
 

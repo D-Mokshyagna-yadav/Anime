@@ -40,7 +40,7 @@ const RecommendationsPage: React.FC = () => {
   const genres = ['All Genres', 'Action', 'Romance', 'Sci-Fi', 'Comedy', 'Drama', 'Thriller'];
 
   useEffect(() => {
-    setPageMeta('Recommendations', 'Get personalized anime recommendations based on your watchlist on AniStream.');
+    setPageMeta('Recommendations', 'Get personalized anime recommendations based on your watchlist on SensuiWatch.');
 
     if (!isAuthenticated) {
       navigate('/login');

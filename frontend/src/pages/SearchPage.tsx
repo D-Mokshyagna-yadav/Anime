@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import AnimeCard from '../components/AnimeCard';
 import type { AniMedia } from '../api/client';
-import { fetchSearch } from '../api/client';
+import { fetchLatest, fetchSearch, fetchTrending } from '../api/client';
 import './SearchPage.css';
 
 const GENRES = ['Action','Adventure','Comedy','Drama','Ecchi','Fantasy','Horror','Mahou Shoujo','Mecha','Music','Mystery','Psychological','Romance','Sci-Fi','Slice of Life','Sports','Supernatural','Thriller'];
@@ -13,8 +13,8 @@ const STATUSES = [{ label: 'All', value: '' }, { label: 'Airing', value: 'RELEAS
 const FORMATS  = [{ label: 'All', value: '' }, { label: 'TV', value: 'TV' }, { label: 'Movie', value: 'MOVIE' }, { label: 'OVA', value: 'OVA' }, { label: 'ONA', value: 'ONA' }, { label: 'Special', value: 'SPECIAL' }];
 
 const SkeletonCard = () => (
-  <div>
-    <div className="skeleton" style={{ height: 280, borderRadius: 12 }} />
+  <div style={{ width: 'var(--anime-card-width)' }}>
+    <div className="skeleton" style={{ aspectRatio: '2 / 3', borderRadius: 12 }} />
     <div className="skeleton" style={{ height: 14, marginTop: 10, borderRadius: 6, width: '80%' }} />
     <div className="skeleton" style={{ height: 12, marginTop: 6, borderRadius: 6, width: '50%' }} />
   </div>
@@ -31,19 +31,26 @@ export default function SearchPage() {
   const genre  = params.get('genre') || '';
   const status = params.get('status') || '';
   const page   = Number(params.get('page') || 1);
+  const sort   = params.get('sort') || '';
 
   const [inputVal, setInputVal] = useState(q);
 
   const doSearch = useCallback(() => {
     setLoading(true);
-    fetchSearch(q, page, genre || undefined, status || undefined)
+    const request = sort === 'trending'
+      ? fetchTrending(page)
+      : sort === 'latest'
+      ? fetchLatest(page)
+      : fetchSearch(q, page, genre || undefined, status || undefined);
+
+    request
       .then(r => {
         setResults(r.data.data?.media || []);
         setTotalPages(r.data.data?.pageInfo?.lastPage || 1);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [q, page, genre, status]);
+  }, [q, page, genre, status, sort]);
 
   useEffect(() => { doSearch(); }, [doSearch]);
   useEffect(() => { setInputVal(q); }, [q]);
@@ -230,7 +237,7 @@ export default function SearchPage() {
 
       <footer className="footer">
         <div className="container footer-inner">
-          <span>© 2025 AniStream — Anime Streaming Platform</span>
+          <span>© 2025 SensuiWatch — Anime Streaming Platform</span>
           <div className="footer-links">
             <a href="#">About</a><a href="#">Contact</a><a href="#">DMCA</a>
           </div>

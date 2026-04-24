@@ -1,7 +1,7 @@
-# AniStream - Complete Implementation Guide
+# SensuiWatch - Complete Implementation Guide
 
 ## Project Overview
-AniStream is a modern anime discovery, tracking, and streaming platform built with React, TypeScript, Node.js, and Prisma. Users can search for anime, add them to watchlists, and watch episodes through HLS streaming.
+SensuiWatch is a modern anime discovery, tracking, and streaming platform built with React, TypeScript, Node.js, and Prisma. Users can search for anime, add them to watchlists, and watch episodes through HLS streaming.
 
 **Live Servers:**
 - Frontend: http://localhost:5173
@@ -411,7 +411,7 @@ JWT_EXPIRY=7d
 ### Frontend (.env)
 ```env
 VITE_API_URL=http://localhost:5000/api
-VITE_APP_NAME=AniStream
+VITE_APP_NAME=SensuiWatch
 ```
 
 ---

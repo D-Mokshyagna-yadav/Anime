@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * AniStream API Test Suite
+ * SensuiWatch API Test Suite
  * Run with: node test-api.mjs
  */
 
@@ -79,7 +79,7 @@ async function test(name, url) {
 }
 
 async function runTests() {
-  console.log(`${colors.bold}${colors.cyan}AniStream API Test Suite${colors.reset}\n`);
+  console.log(`${colors.bold}${colors.cyan}SensuiWatch API Test Suite${colors.reset}\n`);
   console.log(`Base URL: ${BASE_URL}`);
   console.log(`Timeout: ${TIMEOUT}ms\n`);
   

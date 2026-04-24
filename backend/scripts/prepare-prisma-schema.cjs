@@ -39,6 +39,30 @@ function detectDatabaseType(databaseUrl, dbTypeOverride) {
   return 'mongodb';
 }
 
+function ensureMongoDatabaseName(databaseUrl) {
+  const trimmed = String(databaseUrl || '').trim();
+  if (!trimmed) return trimmed;
+
+  if (!trimmed.startsWith('mongodb://') && !trimmed.startsWith('mongodb+srv://')) {
+    return trimmed;
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return trimmed;
+  }
+
+  if ((parsed.pathname || '').length > 1) {
+    return trimmed;
+  }
+
+  const fallbackName = String(process.env.DATABASE_NAME || 'SensuiWatch').trim() || 'SensuiWatch';
+  parsed.pathname = `/${fallbackName}`;
+  return parsed.toString();
+}
+
 function loadTemplate(filePath) {
   return fs.readFileSync(filePath, 'utf8');
 }
@@ -48,9 +72,15 @@ function writeSchema(schema) {
 }
 
 function run() {
-  const databaseUrl = process.env.DATABASE_URL;
+  const rawDatabaseUrl = process.env.DATABASE_URL;
   const dbTypeOverride = process.env.DB_TYPE;
+  const databaseUrl = ensureMongoDatabaseName(rawDatabaseUrl);
   const dbType = detectDatabaseType(databaseUrl, dbTypeOverride);
+
+  if (databaseUrl && rawDatabaseUrl !== databaseUrl) {
+    process.env.DATABASE_URL = databaseUrl;
+    console.log('[prisma] DATABASE_URL normalized with fallback database name.');
+  }
 
   let schema;
   if (dbType === 'mongodb') {

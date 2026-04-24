@@ -14,6 +14,7 @@ model User {
   createdAt    DateTime    @default(now())
   watchlists   Watchlist[]
   reviews      Review[]
+  notifications Notification[]
 }
 
 model Watchlist {
@@ -43,4 +44,19 @@ model Review {
   @@index([userId])
   @@index([animeId])
   @@unique([userId, animeId])
+}
+
+model Notification {
+  id            String   @id @default(cuid())
+  userId        String
+  animeId       String
+  animeTitle    String
+  episodeNumber Int
+  createdAt     DateTime @default(now())
+  seen          Boolean  @default(false)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, seen])
+  @@index([animeId])
+  @@unique([userId, animeId, episodeNumber])
 }

@@ -1,4 +1,4 @@
-# AniStream - Session Continuation Summary
+# SensuiWatch - Session Continuation Summary
 
 **Date**: April 23, 2026  
 **Focus**: Manual Testing, Bug Fixes, and MegaPlay API Integration  

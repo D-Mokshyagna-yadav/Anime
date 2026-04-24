@@ -67,8 +67,8 @@ function ensureMongoDatabaseName(databaseUrl: string): string {
     return trimmed;
   }
 
-  const fallbackDatabaseName = (process.env.DATABASE_NAME || 'anistream').trim();
-  parsed.pathname = `/${fallbackDatabaseName || 'anistream'}`;
+  const fallbackDatabaseName = (process.env.DATABASE_NAME || 'SensuiWatch').trim();
+  parsed.pathname = `/${fallbackDatabaseName || 'SensuiWatch'}`;
   return parsed.toString();
 }
 

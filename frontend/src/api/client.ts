@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logError, logEvent } from '../utils/logger';
 
 // Determine API base URL
 // In production (Docker), frontend and backend are on same origin
@@ -23,12 +24,37 @@ const client = axios.create({
 
 // Add token to requests if available
 client.interceptors.request.use((config) => {
+  logEvent('API', 'request', {
+    method: config.method,
+    url: `${config.baseURL || ''}${config.url || ''}`,
+    params: config.params,
+  });
+
   const token = localStorage.getItem('authToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+client.interceptors.response.use(
+  (response) => {
+    logEvent('API', 'response', {
+      method: response.config.method,
+      url: `${response.config.baseURL || ''}${response.config.url || ''}`,
+      status: response.status,
+    });
+    return response;
+  },
+  (error) => {
+    logError('API', error?.message || error, {
+      method: error?.config?.method,
+      url: `${error?.config?.baseURL || ''}${error?.config?.url || ''}`,
+      status: error?.response?.status,
+    });
+    return Promise.reject(error);
+  }
+);
 
 export default client;
 
@@ -40,6 +66,8 @@ export interface AniMedia {
   coverImage: { extraLarge: string; large: string; medium: string; color: string };
   bannerImage: string;
   description: string;
+  isAdult?: boolean;
+  tags?: { name: string; rank?: number; isMediaSpoiler?: boolean }[];
   genres: string[];
   averageScore: number;
   popularity: number;
@@ -60,6 +88,41 @@ export interface PageInfo {
 }
 
 export interface AniPage { media: AniMedia[]; pageInfo: PageInfo; }
+
+const BLOCKED_TERMS = ['hentai', 'adult', 'nsfw', 'explicit', 'porn'];
+
+const hasBlockedTerm = (value?: string) => {
+  if (!value) return false;
+  const normalized = value.toLowerCase();
+  return BLOCKED_TERMS.some((term) => normalized.includes(term));
+};
+
+export const isSafeAnime = (anime: AniMedia) => {
+  if (anime.isAdult === true) {
+    return false;
+  }
+
+  if ((anime.genres || []).some((genre) => hasBlockedTerm(genre))) {
+    return false;
+  }
+
+  if ((anime.tags || []).some((tag) => hasBlockedTerm(tag.name))) {
+    return false;
+  }
+
+  return true;
+};
+
+const sanitizeAnimePage = (page?: AniPage): AniPage => {
+  if (!page?.media) {
+    return { media: [], pageInfo: page?.pageInfo || { total: 0, currentPage: 1, lastPage: 1, hasNextPage: false, perPage: 0 } };
+  }
+
+  return {
+    ...page,
+    media: page.media.filter(isSafeAnime),
+  };
+};
 
 export interface User {
   id: string;
@@ -98,16 +161,35 @@ export interface UserStats {
   reviewsWritten: number;
 }
 
+export interface UserNotification {
+  id: string;
+  animeId: string;
+  animeTitle: string;
+  episodeNumber: number;
+  episodeId: string;
+  createdAt: string;
+  seen: boolean;
+}
+
 // ── Anime API ─────────────────────────────────────────────
-export const fetchTrending   = (page = 1) => client.get<{ data: AniPage }>('/anime/trending', { params: { page } });
-export const fetchPopular    = (page = 1) => client.get<{ data: AniPage }>('/anime/popular',  { params: { page } });
-export const fetchSeasonal   = (season: string, year: number) => client.get<{ data: AniPage }>('/anime/seasonal', { params: { season, year } });
+export const fetchTrending   = (page = 1) => client.get<{ data: AniPage }>('/anime/trending', { params: { page } }).then((response) => ({ ...response, data: { ...response.data, data: sanitizeAnimePage(response.data.data) } }));
+export const fetchLatest     = (page = 1) => client.get<{ data: AniPage }>('/anime/latest', { params: { page } }).then((response) => ({ ...response, data: { ...response.data, data: sanitizeAnimePage(response.data.data) } }));
+export const fetchPopular    = (page = 1) => client.get<{ data: AniPage }>('/anime/popular',  { params: { page } }).then((response) => ({ ...response, data: { ...response.data, data: sanitizeAnimePage(response.data.data) } }));
+export const fetchSeasonal   = (season: string, year: number) => client.get<{ data: AniPage }>('/anime/seasonal', { params: { season, year } }).then((response) => ({ ...response, data: { ...response.data, data: sanitizeAnimePage(response.data.data) } }));
+export const fetchGenres     = () => client.get<{ data: string[] }>('/anime/genres');
 export const fetchCalendar   = (season: string, year: number, page = 1) => 
   client.get<{ data: { calendar: Record<string, any[]>; season: string; year: number; totalAnime: number; pageInfo: PageInfo } }>
   ('/anime/calendar', { params: { season, year, page } });
-export const fetchAnimeById  = (id: number) => client.get<{ data: AniMedia }>(`/anime/${id}`);
+export const fetchAnimeById  = (id: number) =>
+  client.get<{ data: AniMedia }>(`/anime/${id}`).then((response) => {
+    if (!isSafeAnime(response.data.data)) {
+      throw new Error('Anime is unavailable');
+    }
+
+    return response;
+  });
 export const fetchSearch     = (q: string, page = 1, genre?: string, status?: string) =>
-  client.get<{ data: AniPage }>('/anime/search', { params: { q, page, genre, status } });
+  client.get<{ data: AniPage }>('/anime/search', { params: { q, page, genre, status } }).then((response) => ({ ...response, data: { ...response.data, data: sanitizeAnimePage(response.data.data) } }));
 export const fetchEpisodes = (
   slug: string,
   options: {
@@ -193,6 +275,21 @@ export const profileGet = () =>
 
 export const profileUpdate = (currentPassword?: string, newPassword?: string) =>
   client.put<{ success: boolean; message: string }>('/user/profile', { currentPassword, newPassword });
+
+// Notifications API
+export const notificationsGet = (limit = 25) =>
+  client.get<{ success: boolean; notifications: UserNotification[]; unreadCount: number }>('/user/notifications', {
+    params: { limit },
+  });
+
+export const notificationsMarkSeen = (notificationId: string) =>
+  client.patch<{ success: boolean }>('/user/notifications/' + notificationId + '/seen');
+
+export const notificationsMarkAllRead = () =>
+  client.patch<{ success: boolean; updated: number }>('/user/notifications/read-all');
+
+export const notificationsClearAll = () =>
+  client.delete<{ success: boolean; removed: number }>('/user/notifications');
 
 // ── MegaPlay Streaming API (Reliable hosted player) ──────
 export interface MegaPlayStreamInfo {

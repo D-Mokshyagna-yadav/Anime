@@ -1,4 +1,4 @@
-# AniStream - Integration Checklist & Verification
+# SensuiWatch - Integration Checklist & Verification
 
 ## ✅ Backend Status - VERIFIED
 
@@ -93,7 +93,7 @@
 
 ### Terminal Status
 ```
-[API] 🚀 AniStream backend running at http://localhost:5000
+[API] 🚀 SensuiWatch backend running at http://localhost:5000
 [WEB] ➜  Local: http://localhost:5173/
 [WEB] VITE v8.0.9 ready
 ```

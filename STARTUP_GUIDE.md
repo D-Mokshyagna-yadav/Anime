@@ -1,4 +1,4 @@
-# AniStream - Setup & Startup Guide
+# SensuiWatch - Setup & Startup Guide
 
 ## Quick Start
 

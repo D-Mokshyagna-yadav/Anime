@@ -1,7 +1,7 @@
 {
-  "name": "anistream",
+  "name": "SensuiWatch",
   "version": "1.0.0",
-  "description": "AniStream - Free Anime Streaming Platform",
+  "description": "SensuiWatch - Free Anime Streaming Platform",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\" --names \"API,WEB\" --prefix-colors \"blue.bold,cyan.bold\"",

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { AniMedia } from '../api/client';
+import { isSafeAnime, type AniMedia } from '../api/client';
 import { Star, Play } from 'lucide-react';
 import { getAiredEpisodeCount } from '../utils/anime';
 import { applyImageFallback, buildBackgroundImage, getAnimePosterImage } from '../utils/images';
@@ -11,6 +11,10 @@ interface Props {
 }
 
 export default function AnimeCard({ anime, size = 'normal' }: Props) {
+  if (!isSafeAnime(anime)) {
+    return null;
+  }
+
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
