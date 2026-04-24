@@ -47,9 +47,6 @@ COPY backend/package.json backend/package-lock.json ./backend/
 # Install only production dependencies for backend
 RUN npm ci --workspace=backend --omit=dev --legacy-peer-deps
 
-# Install Prisma CLI for runtime generate (required for DB provider switching).
-RUN npm install --workspace=backend --no-save prisma@5.22.0
-
 # Copy pre-generated Prisma client from builder stage
 COPY --from=builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
 COPY --from=builder /app/backend/node_modules/@prisma ./backend/node_modules/@prisma
@@ -66,4 +63,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && npx --yes prisma@5.22.0 generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]
+CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && node backend/dist/index.js"]

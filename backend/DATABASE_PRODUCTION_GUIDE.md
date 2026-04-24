@@ -82,3 +82,5 @@ On backend startup:
    - SQL: `npm run prisma:migrate` or `npx prisma migrate deploy`
 4. Run `npm run prisma:generate`.
 5. Start server with `npm run start`.
+
+When building the Docker image, Prisma is generated during the build stage and the container starts the compiled backend directly. Runtime regeneration is intentionally avoided because it depends on downloading engine artifacts inside the running container.
