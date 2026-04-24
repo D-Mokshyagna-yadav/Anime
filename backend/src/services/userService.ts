@@ -31,19 +31,23 @@ interface UpsertReviewInput {
   comment?: string;
 }
 
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
 export async function findUserByEmail(email: string) {
-  return prisma.user.findUnique({ where: { email } });
+  return prisma.user.findUnique({ where: { email: normalizeEmail(email) } });
 }
 
 export async function createUser({ email, password }: CreateUserInput) {
   const passwordHash = await bcrypt.hash(password, 10);
   return prisma.user.create({
-    data: { email, passwordHash },
+    data: { email: normalizeEmail(email), passwordHash },
   });
 }
 
 export async function verifyUserCredentials(email: string, password: string) {
-  const user = await findUserByEmail(email);
+  const user = await findUserByEmail(normalizeEmail(email));
   if (!user || !user.passwordHash) {
     return null;
   }

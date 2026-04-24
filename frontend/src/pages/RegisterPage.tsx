@@ -22,7 +22,9 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!email || !password || !confirm) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !password || !confirm) {
       setError('Please fill in all fields.');
       return;
     }
@@ -36,10 +38,10 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      await signup(email, password);
+      await signup(normalizedEmail, password);
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed.');
+      setError(err.response?.data?.message || err.message || 'Unable to complete registration.');
     } finally {
       setLoading(false);
     }

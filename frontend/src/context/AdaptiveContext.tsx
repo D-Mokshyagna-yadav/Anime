@@ -137,8 +137,6 @@ export function AdaptiveProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--adaptive-grid-columns', String(columns));
     root.style.setProperty('--adaptive-ui-scale', deviceType === 'tv' ? '1.18' : deviceType === 'mobile' ? '0.96' : '1');
 
-    body.classList.toggle('has-left-rail', deviceType === 'desktop' || deviceType === 'tv');
-
     ['mobile', 'tablet', 'desktop', 'tv'].forEach((value) => body.classList.remove(`device-${value}`));
     ['touch', 'mouse', 'keyboard', 'remote'].forEach((value) => body.classList.remove(`input-${value}`));
 

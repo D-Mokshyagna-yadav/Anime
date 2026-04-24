@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Home, Search, X, Tv2, User, LogOut, ListVideo, Film, Bookmark, Settings, PlayCircle } from 'lucide-react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Search, X, Menu, Tv2, User, LogOut, ListVideo, Film, Bookmark, Settings, PlayCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAdaptive } from '../context/AdaptiveContext';
 import './Navbar.css';
@@ -9,15 +9,16 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
   const { deviceType, isRemoteLike } = useAdaptive();
 
   const isMobile = deviceType === 'mobile';
-  const hasLeftRail = deviceType === 'desktop' || deviceType === 'tv';
   const optionalAvatarUser = user as (typeof user & { avatarUrl?: string; image?: string }) | null;
   const avatarUrl = optionalAvatarUser?.avatarUrl || optionalAvatarUser?.image || '';
   const avatarInitials = user?.email
@@ -46,6 +47,12 @@ export default function Navbar() {
   useEffect(() => {
     if (searchOpen) inputRef.current?.focus();
   }, [searchOpen]);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setProfileMenuOpen(false);
+    setSearchOpen(false);
+  }, [location.pathname]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +104,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`navbar glass ${scrolled ? 'scrolled' : ''} ${hasLeftRail ? 'with-rail' : ''}`}>
+      <nav className={`navbar glass ${scrolled ? 'scrolled' : ''}`}>
         <div className="container navbar-inner">
           <Link to="/" className="navbar-logo" aria-label="AniStream Home">
             <Tv2 size={26} color="var(--primary)" strokeWidth={2.5} />
@@ -107,6 +114,17 @@ export default function Navbar() {
           {!isMobile && renderLinks()}
 
           <div className="navbar-actions">
+            {isMobile && (
+              <button
+                className="icon-btn mobile-menu-btn"
+                onClick={() => setMobileMenuOpen((open) => !open)}
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            )}
+
             {(searchOpen || !isMobile) && (
               <form onSubmit={handleSearch} className="search-form" role="search">
                 <input
@@ -182,8 +200,15 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {hasLeftRail && (
-        <aside className={`left-rail ${isRemoteLike ? 'remote-nav' : ''}`} aria-label="Sidebar navigation">
+      {isMobile && mobileMenuOpen && (
+        <>
+          <button
+            type="button"
+            className="mobile-menu-backdrop"
+            aria-label="Close menu overlay"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <aside className={`left-rail mobile-drawer ${isRemoteLike ? 'remote-nav' : ''}`} aria-label="Sidebar navigation">
           <div className="left-rail-brand">
             <Tv2 size={24} color="var(--primary-dim)" />
             <span>Browse</span>
@@ -191,17 +216,29 @@ export default function Navbar() {
 
           <div className="left-rail-links">
             {navItems.map((item) => (
-              <NavLink key={item.to} to={item.to} className={({ isActive }) => `rail-link ${isActive ? 'active' : ''}`}>
+              <NavLink key={item.to} to={item.to} className={({ isActive }) => `rail-link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
                 <item.icon size={18} />
                 <span>{item.label}</span>
               </NavLink>
             ))}
-            <NavLink to="/search" className={({ isActive }) => `rail-link ${isActive ? 'active' : ''}`}>
+            <NavLink to="/search" className={({ isActive }) => `rail-link ${isActive ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}>
               <Search size={18} />
               <span>Search</span>
             </NavLink>
+
+            {!user && (
+              <div className="mobile-auth-links">
+                <Link to="/login" className="btn-ghost mobile-auth-link" onClick={() => setMobileMenuOpen(false)}>
+                  <User size={15} /> <span>Sign In</span>
+                </Link>
+                <Link to="/register" className="btn-primary mobile-auth-link" onClick={() => setMobileMenuOpen(false)}>
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
-        </aside>
+          </aside>
+        </>
       )}
 
       {isMobile && (

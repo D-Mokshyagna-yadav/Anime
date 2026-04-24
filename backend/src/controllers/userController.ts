@@ -20,21 +20,28 @@ const getRequiredUserId = (req: Request) => req.userId;
 export async function signup(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ success: false, message: 'Email and password required' });
     }
 
-    const existing = await findUserByEmail(email);
+    const existing = await findUserByEmail(normalizedEmail);
     if (existing) {
       return res.status(409).json({ success: false, message: 'User already exists' });
     }
 
-    const user = await createUser({ email, password });
+    const user = await createUser({ email: normalizedEmail, password });
     const token = generateToken(user.id, user.email);
     return res.json({ success: true, token, user: { id: user.id, email: user.email } });
   } catch (error) {
-    return res.status(500).json({ success: false, message: String(error) });
+    const message = error instanceof Error ? error.message : String(error);
+
+    if (message.includes('P2002') || message.toLowerCase().includes('unique constraint') || message.toLowerCase().includes('duplicate')) {
+      return res.status(409).json({ success: false, message: 'User already exists' });
+    }
+
+    return res.status(500).json({ success: false, message: 'Registration failed. Please try again.' });
   }
 }
 

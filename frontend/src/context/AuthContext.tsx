@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await authLogin(email, password);
+    const response = await authLogin(email.trim().toLowerCase(), password);
     if (response.data.success) {
       localStorage.setItem('authToken', response.data.token);
       setUser(response.data.user);
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (email: string, password: string) => {
-    const response = await authSignup(email, password);
+    const response = await authSignup(email.trim().toLowerCase(), password);
     if (response.data.success) {
       localStorage.setItem('authToken', response.data.token);
       setUser(response.data.user);

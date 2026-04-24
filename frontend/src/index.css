@@ -169,18 +169,6 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
   color: var(--text-muted);
 }
 
-body.has-left-rail .page,
-body.has-left-rail .watch-page {
-  padding-left: var(--left-rail-width);
-}
-
-@media (max-width: 1024px) {
-  body.has-left-rail .page,
-  body.has-left-rail .watch-page {
-    padding-left: 0;
-  }
-}
-
 body.input-touch button,
 body.input-touch .btn-primary,
 body.input-touch .btn-ghost,
