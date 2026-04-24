@@ -1,586 +1,442 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertCircle, Bell, Palette, RefreshCw, Save, Shield, Sparkles, UserCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import {
-  User,
-  Lock,
-  Eye,
-  Moon,
-  Bell,
-  Shield,
-  ChevronRight,
-  Save,
-  AlertTriangle,
-} from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { avatarOptionsGet, profileUpdate, type AvatarOption, type UserSettings } from '../api/client';
+import { useAuth } from '../context/AuthContext';
+import { DEFAULT_PROFILE_AVATAR } from '../utils/images';
 import { setPageMeta } from '../utils/seo';
+import { mergeUserSettings } from '../utils/userPreferences';
 import './SettingsPage.css';
 
-interface SettingsState {
-  account: {
-    email: string;
-    currentPassword: string;
-    newPassword: string;
-    confirmPassword: string;
-  };
-  preferences: {
-    language: string;
-    animeOrder: string;
-    autoPlayNext: boolean;
-  };
-  display: {
-    theme: 'dark' | 'light';
-    fontSize: string;
-    showNSFW: boolean;
-  };
-  notifications: {
-    newReleases: boolean;
-    watchlistUpdates: boolean;
-    communityPosts: boolean;
-    recommendations: boolean;
-  };
-  privacy: {
-    publicProfile: boolean;
-    allowRecommendations: boolean;
-  };
-}
+type SettingsTab = 'profile' | 'playback' | 'appearance' | 'notifications' | 'privacy';
 
-const SettingsPage: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
+const SETTINGS_TABS: Array<{ id: SettingsTab; label: string; icon: typeof UserCircle2 }> = [
+  { id: 'profile', label: 'Profile', icon: UserCircle2 },
+  { id: 'playback', label: 'Playback', icon: Sparkles },
+  { id: 'appearance', label: 'Appearance', icon: Palette },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'privacy', label: 'Privacy', icon: Shield },
+];
+
+export default function SettingsPage() {
+  const { user, isAuthenticated, loading: authLoading, refreshUser } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('account');
-  const [settings, setSettings] = useState<SettingsState>({
-    account: {
-      email: user?.email || '',
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
-    preferences: {
-      language: 'en',
-      animeOrder: 'latest',
-      autoPlayNext: true,
-    },
-    display: {
-      theme: 'dark',
-      fontSize: 'medium',
-      showNSFW: false,
-    },
-    notifications: {
-      newReleases: true,
-      watchlistUpdates: true,
-      communityPosts: false,
-      recommendations: true,
-    },
-    privacy: {
-      publicProfile: false,
-      allowRecommendations: true,
-    },
-  });
-
+  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
+  const [draftSettings, setDraftSettings] = useState<UserSettings>(mergeUserSettings(user?.settings));
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(user?.avatarUrl || null);
+  const [avatarOptions, setAvatarOptions] = useState<AvatarOption[]>([]);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  React.useEffect(() => {
-    setPageMeta('Settings', 'Manage your SensuiWatch account settings and preferences.');
+  const memberSince = useMemo(() => {
+    if (!user?.createdAt) return 'Recently joined';
+    return new Date(user.createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  }, [user?.createdAt]);
 
+  const loadAvatarOptions = async () => {
+    setAvatarLoading(true);
+    try {
+      const response = await avatarOptionsGet(24);
+      setAvatarOptions(response.data.options || []);
+      setError('');
+    } catch {
+      setError('Avatar suggestions are unavailable right now, but you can still save your other settings.');
+    } finally {
+      setAvatarLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setPageMeta('Settings', 'Update your account, anime avatar, playback preferences, and privacy settings.');
+  }, []);
+
+  useEffect(() => {
+    if (authLoading) return;
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
-  }, [isAuthenticated, navigate]);
+
+    void loadAvatarOptions();
+  }, [authLoading, isAuthenticated, navigate]);
+
+  useEffect(() => {
+    setDraftSettings(mergeUserSettings(user?.settings));
+    setSelectedAvatar(user?.avatarUrl || null);
+  }, [user?.avatarUrl, user?.settings]);
+
+  const updateSection = <K extends keyof UserSettings>(section: K, value: UserSettings[K]) => {
+    setDraftSettings((previous) => ({
+      ...previous,
+      [section]: value,
+    }));
+  };
+
+  const resetDraft = () => {
+    setDraftSettings(mergeUserSettings(user?.settings));
+    setSelectedAvatar(user?.avatarUrl || null);
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setError('');
+    setMessage('');
+  };
 
   const handleSave = async () => {
+    setError('');
+    setMessage('');
+
+    if (newPassword || confirmPassword || currentPassword) {
+      if (!currentPassword) {
+        setError('Enter your current password before setting a new one.');
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        setError('New password must be at least 8 characters.');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        setError('New password and confirmation do not match.');
+        return;
+      }
+    }
+
+    setSaving(true);
     try {
-      // In a real app, send to backend
-      console.log('Saving settings:', settings);
-      setMessage('Settings saved successfully!');
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      setError('Failed to save settings');
+      const response = await profileUpdate({
+        currentPassword: currentPassword || undefined,
+        newPassword: newPassword || undefined,
+        avatarUrl: selectedAvatar,
+        settings: draftSettings,
+      });
+
+      setMessage(response.data.message || 'Settings saved successfully.');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      await refreshUser();
+    } catch (saveError: any) {
+      setError(saveError?.response?.data?.message || 'Failed to save your settings.');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handlePasswordChange = async () => {
-    if (settings.account.newPassword !== settings.account.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    try {
-      // TODO: Call backend password change endpoint
-      setMessage('Password changed successfully!');
-      setSettings(prev => ({
-        ...prev,
-        account: {
-          ...prev.account,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: '',
-        },
-      }));
-      setTimeout(() => setMessage(''), 3000);
-    } catch (err) {
-      setError('Failed to change password');
-    }
-  };
-
-  const tabs = [
-    { id: 'account', label: 'Account', icon: User },
-    { id: 'preferences', label: 'Preferences', icon: Eye },
-    { id: 'display', label: 'Display', icon: Moon },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'privacy', label: 'Privacy', icon: Shield },
-  ];
-
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !authLoading) {
     return null;
   }
 
   return (
-    <div className="settings-container">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="settings-header"
-      >
-        <h1>Settings</h1>
-        <p className="breadcrumb">Profile → Settings</p>
-      </motion.div>
+    <div className="settings-page">
+      <Navbar />
 
-      {/* Messages */}
-      {message && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="success-alert"
-        >
-          {message}
-        </motion.div>
-      )}
+      <main className="settings-shell container">
+        <motion.header initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} className="settings-hero">
+          <div>
+            <p className="settings-kicker">Account Control</p>
+            <h1>Settings</h1>
+            <p>Personalize your avatar, playback defaults, display feel, and privacy preferences from one clean responsive panel.</p>
+          </div>
+        </motion.header>
 
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="error-alert"
-        >
-          <AlertTriangle size={18} />
-          {error}
-        </motion.div>
-      )}
+        {message && <div className="settings-alert success">{message}</div>}
+        {error && (
+          <div className="settings-alert error">
+            <AlertCircle size={18} />
+            <span>{error}</span>
+          </div>
+        )}
 
-      <div className="settings-layout">
-        {/* Sidebar */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="settings-sidebar"
-        >
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`sidebar-button ${activeTab === tab.id ? 'active' : ''}`}
-              >
-                <Icon size={20} />
-                <span>{tab.label}</span>
-                {activeTab === tab.id && <ChevronRight size={18} />}
-              </button>
-            );
-          })}
-        </motion.div>
-
-        {/* Main Content */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="settings-content"
-        >
-          {/* Account Tab */}
-          {activeTab === 'account' && (
-            <div>
-              <h2 className="tab-title">Account Settings</h2>
-
-              <div className="settings-group">
-                <label>Email Address</label>
-                <div className="static-field">{settings.account.email}</div>
-                <p className="field-hint">Email address cannot be changed</p>
-              </div>
-
-              <div className="divider" />
-
-              <h3 className="subsection-title">Change Password</h3>
-
-              <div className="settings-group">
-                <label>Current Password</label>
-                <input
-                  type="password"
-                  value={settings.account.currentPassword}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      account: { ...prev.account, currentPassword: e.target.value },
-                    }))
-                  }
-                  placeholder="Enter current password"
-                  className="settings-input"
-                />
-              </div>
-
-              <div className="settings-group">
-                <label>New Password</label>
-                <input
-                  type="password"
-                  value={settings.account.newPassword}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      account: { ...prev.account, newPassword: e.target.value },
-                    }))
-                  }
-                  placeholder="Enter new password"
-                  className="settings-input"
-                />
-              </div>
-
-              <div className="settings-group">
-                <label>Confirm New Password</label>
-                <input
-                  type="password"
-                  value={settings.account.confirmPassword}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      account: { ...prev.account, confirmPassword: e.target.value },
-                    }))
-                  }
-                  placeholder="Confirm new password"
-                  className="settings-input"
-                />
-              </div>
-
-              <button onClick={handlePasswordChange} className="btn-change-password">
-                <Lock size={18} />
-                Update Password
-              </button>
-
-              <div className="divider" />
-
-              <h3 className="subsection-title danger">Danger Zone</h3>
-              <button className="btn-delete-account">
-                <AlertTriangle size={18} />
-                Delete Account
-              </button>
-            </div>
-          )}
-
-          {/* Preferences Tab */}
-          {activeTab === 'preferences' && (
-            <div>
-              <h2 className="tab-title">Preferences</h2>
-
-              <div className="settings-group">
-                <label>Language</label>
-                <select
-                  value={settings.preferences.language}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      preferences: { ...prev.preferences, language: e.target.value },
-                    }))
-                  }
-                  className="settings-input"
+        <div className="settings-layout">
+          <aside className="settings-sidebar">
+            {SETTINGS_TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  className={`settings-sidebar-btn ${activeTab === tab.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
                 >
-                  <option value="en">English</option>
-                  <option value="jp">Japanese</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                </select>
-              </div>
+                  <Icon size={18} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </aside>
 
-              <div className="settings-group">
-                <label>Anime Order</label>
-                <select
-                  value={settings.preferences.animeOrder}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      preferences: { ...prev.preferences, animeOrder: e.target.value },
-                    }))
-                  }
-                  className="settings-input"
-                >
-                  <option value="latest">Latest First</option>
-                  <option value="alphabetical">Alphabetical</option>
-                  <option value="rating">Highest Rated</option>
-                </select>
-              </div>
-
-              <div className="settings-group toggle">
-                <div>
-                  <label>Auto-play Next Episode</label>
-                  <p className="field-hint">Automatically play next episode when finished</p>
+          <motion.section key={activeTab} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} className="settings-panel">
+            {activeTab === 'profile' && (
+              <div className="settings-section-stack">
+                <div className="settings-profile-card">
+                  <img
+                    src={selectedAvatar || user?.avatarUrl || DEFAULT_PROFILE_AVATAR}
+                    alt={user?.email || 'Avatar'}
+                    className="settings-avatar-preview"
+                  />
+                  <div>
+                    <h2>{user?.email?.split('@')[0] || 'Anime Fan'}</h2>
+                    <p>{user?.email}</p>
+                    <span>Member since {memberSince}</span>
+                  </div>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.preferences.autoPlayNext}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      preferences: { ...prev.preferences, autoPlayNext: e.target.checked },
-                    }))
-                  }
-                  className="toggle-checkbox"
-                />
-              </div>
-            </div>
-          )}
 
-          {/* Display Tab */}
-          {activeTab === 'display' && (
-            <div>
-              <h2 className="tab-title">Display Settings</h2>
+                <div className="settings-block">
+                  <div className="settings-block-header">
+                    <div>
+                      <h3>Choose an anime avatar</h3>
+                      <p>Suggestions are fetched from a safe-for-work anime image source.</p>
+                    </div>
+                    <button className="btn-ghost settings-inline-btn" onClick={() => void loadAvatarOptions()} disabled={avatarLoading}>
+                      <RefreshCw size={16} className={avatarLoading ? 'spin' : ''} />
+                      Refresh
+                    </button>
+                  </div>
 
-              <div className="settings-group">
-                <label>Theme</label>
-                <div className="theme-selector">
-                  <button
-                    onClick={() =>
-                      setSettings(prev => ({
-                        ...prev,
-                        display: { ...prev.display, theme: 'dark' },
-                      }))
-                    }
-                    className={`theme-btn ${settings.display.theme === 'dark' ? 'active' : ''}`}
-                  >
-                    🌙 Dark
-                  </button>
-                  <button
-                    onClick={() =>
-                      setSettings(prev => ({
-                        ...prev,
-                        display: { ...prev.display, theme: 'light' },
-                      }))
-                    }
-                    className={`theme-btn ${settings.display.theme === 'light' ? 'active' : ''}`}
-                  >
-                    ☀️ Light
-                  </button>
+                  <div className="avatar-grid">
+                    <button
+                      className={`avatar-option default ${selectedAvatar === null ? 'selected' : ''}`}
+                      onClick={() => setSelectedAvatar(null)}
+                    >
+                      <span>Auto</span>
+                    </button>
+                    {avatarOptions.map((avatar) => (
+                      <button
+                        key={avatar.id}
+                        className={`avatar-option ${selectedAvatar === avatar.url ? 'selected' : ''}`}
+                        onClick={() => setSelectedAvatar(avatar.url)}
+                        title={avatar.animeName || avatar.artistName || 'Anime avatar'}
+                      >
+                        <img src={avatar.url} alt={avatar.animeName || 'Anime avatar'} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="settings-block">
+                  <h3>Password</h3>
+                  <div className="settings-field-grid">
+                    <label className="settings-field">
+                      <span>Current password</span>
+                      <input type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} />
+                    </label>
+                    <label className="settings-field">
+                      <span>New password</span>
+                      <input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
+                    </label>
+                    <label className="settings-field">
+                      <span>Confirm password</span>
+                      <input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
+                    </label>
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="settings-group">
-                <label>Font Size</label>
-                <div className="font-size-selector">
-                  <button
-                    onClick={() =>
-                      setSettings(prev => ({
-                        ...prev,
-                        display: { ...prev.display, fontSize: 'small' },
-                      }))
-                    }
-                    className={`size-btn ${settings.display.fontSize === 'small' ? 'active' : ''}`}
-                  >
-                    A
-                  </button>
-                  <button
-                    onClick={() =>
-                      setSettings(prev => ({
-                        ...prev,
-                        display: { ...prev.display, fontSize: 'medium' },
-                      }))
-                    }
-                    className={`size-btn ${settings.display.fontSize === 'medium' ? 'active' : ''}`}
-                  >
-                    <strong>A</strong>
-                  </button>
-                  <button
-                    onClick={() =>
-                      setSettings(prev => ({
-                        ...prev,
-                        display: { ...prev.display, fontSize: 'large' },
-                      }))
-                    }
-                    className={`size-btn ${settings.display.fontSize === 'large' ? 'active' : ''}`}
-                  >
-                    <strong style={{ fontSize: '1.2em' }}>A</strong>
-                  </button>
+            {activeTab === 'playback' && (
+              <div className="settings-section-stack">
+                <div className="settings-block">
+                  <h3>Playback defaults</h3>
+                  <div className="settings-field-grid">
+                    <label className="settings-field">
+                      <span>Language</span>
+                      <select
+                        value={draftSettings.preferences.language}
+                        onChange={(event) =>
+                          updateSection('preferences', { ...draftSettings.preferences, language: event.target.value })
+                        }
+                      >
+                        <option value="en">English</option>
+                        <option value="jp">Japanese</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                      </select>
+                    </label>
+
+                    <label className="settings-field">
+                      <span>Default anime order</span>
+                      <select
+                        value={draftSettings.preferences.animeOrder}
+                        onChange={(event) =>
+                          updateSection('preferences', { ...draftSettings.preferences, animeOrder: event.target.value })
+                        }
+                      >
+                        <option value="latest">Latest First</option>
+                        <option value="alphabetical">Alphabetical</option>
+                        <option value="rating">Highest Rated</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <label className="toggle-card">
+                    <div>
+                      <strong>Auto-play next episode</strong>
+                      <p>Uses your saved preference as the default in the player.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={draftSettings.preferences.autoPlayNext}
+                      onChange={(event) =>
+                        updateSection('preferences', { ...draftSettings.preferences, autoPlayNext: event.target.checked })
+                      }
+                    />
+                  </label>
                 </div>
               </div>
+            )}
 
-              <div className="settings-group toggle">
-                <div>
-                  <label>Show NSFW Content</label>
-                  <p className="field-hint">Display anime with adult content</p>
+            {activeTab === 'appearance' && (
+              <div className="settings-section-stack">
+                <div className="settings-block">
+                  <h3>Accent theme</h3>
+                  <div className="choice-grid">
+                    {[
+                      { key: 'violet', label: 'Violet Pulse' },
+                      { key: 'cyan', label: 'Cyan Drift' },
+                      { key: 'sunset', label: 'Sunset Burst' },
+                    ].map((option) => (
+                      <button
+                        key={option.key}
+                        className={`choice-card ${draftSettings.display.accentTheme === option.key ? 'active' : ''}`}
+                        onClick={() =>
+                          updateSection('display', {
+                            ...draftSettings.display,
+                            accentTheme: option.key as UserSettings['display']['accentTheme'],
+                          })
+                        }
+                      >
+                        <strong>{option.label}</strong>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.display.showNSFW}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      display: { ...prev.display, showNSFW: e.target.checked },
-                    }))
-                  }
-                  className="toggle-checkbox"
-                />
-              </div>
-            </div>
-          )}
 
-          {/* Notifications Tab */}
-          {activeTab === 'notifications' && (
-            <div>
-              <h2 className="tab-title">Notification Preferences</h2>
+                <div className="settings-block">
+                  <h3>Reading comfort</h3>
+                  <div className="choice-grid compact">
+                    {[
+                      { key: 'small', label: 'Compact' },
+                      { key: 'medium', label: 'Balanced' },
+                      { key: 'large', label: 'Large' },
+                    ].map((option) => (
+                      <button
+                        key={option.key}
+                        className={`choice-card ${draftSettings.display.fontSize === option.key ? 'active' : ''}`}
+                        onClick={() =>
+                          updateSection('display', {
+                            ...draftSettings.display,
+                            fontSize: option.key as UserSettings['display']['fontSize'],
+                          })
+                        }
+                      >
+                        <strong>{option.label}</strong>
+                      </button>
+                    ))}
+                  </div>
 
-              <div className="settings-group toggle">
-                <div>
-                  <label>New Release Notifications</label>
-                  <p className="field-hint">Get notified when new episodes air</p>
+                  <label className="toggle-card">
+                    <div>
+                      <strong>Reduced motion</strong>
+                      <p>Softens animations and transitions across the site.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={draftSettings.display.reducedMotion}
+                      onChange={(event) =>
+                        updateSection('display', { ...draftSettings.display, reducedMotion: event.target.checked })
+                      }
+                    />
+                  </label>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.notifications.newReleases}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      notifications: { ...prev.notifications, newReleases: e.target.checked },
-                    }))
-                  }
-                  className="toggle-checkbox"
-                />
               </div>
+            )}
 
-              <div className="settings-group toggle">
-                <div>
-                  <label>Watchlist Updates</label>
-                  <p className="field-hint">Notifications about anime on your watchlist</p>
+            {activeTab === 'notifications' && (
+              <div className="settings-section-stack">
+                <div className="settings-block">
+                  <h3>Notifications</h3>
+                  {[
+                    ['newReleases', 'New release alerts', 'Be notified when a followed anime gets a fresh episode.'],
+                    ['watchlistUpdates', 'Watchlist updates', 'Keep reminders and status updates for items in your library.'],
+                    ['communityPosts', 'Community posts', 'Receive highlights from future community features.'],
+                    ['recommendations', 'Recommendations', 'Get personalized picks based on your library and activity.'],
+                  ].map(([key, title, description]) => (
+                    <label key={key} className="toggle-card">
+                      <div>
+                        <strong>{title}</strong>
+                        <p>{description}</p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={draftSettings.notifications[key as keyof UserSettings['notifications']]}
+                        onChange={(event) =>
+                          updateSection('notifications', {
+                            ...draftSettings.notifications,
+                            [key]: event.target.checked,
+                          })
+                        }
+                      />
+                    </label>
+                  ))}
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.notifications.watchlistUpdates}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      notifications: { ...prev.notifications, watchlistUpdates: e.target.checked },
-                    }))
-                  }
-                  className="toggle-checkbox"
-                />
               </div>
+            )}
 
-              <div className="settings-group toggle">
-                <div>
-                  <label>Community Posts</label>
-                  <p className="field-hint">Updates about community discussions</p>
+            {activeTab === 'privacy' && (
+              <div className="settings-section-stack">
+                <div className="settings-block">
+                  <h3>Privacy</h3>
+                  <label className="toggle-card">
+                    <div>
+                      <strong>Public profile</strong>
+                      <p>Allow your account profile to be shown if social/profile features are enabled.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={draftSettings.privacy.publicProfile}
+                      onChange={(event) =>
+                        updateSection('privacy', { ...draftSettings.privacy, publicProfile: event.target.checked })
+                      }
+                    />
+                  </label>
+
+                  <label className="toggle-card">
+                    <div>
+                      <strong>Use my activity for recommendations</strong>
+                      <p>Improves personalized suggestions based on your watchlist and viewing patterns.</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={draftSettings.privacy.allowRecommendations}
+                      onChange={(event) =>
+                        updateSection('privacy', { ...draftSettings.privacy, allowRecommendations: event.target.checked })
+                      }
+                    />
+                  </label>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.notifications.communityPosts}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      notifications: { ...prev.notifications, communityPosts: e.target.checked },
-                    }))
-                  }
-                  className="toggle-checkbox"
-                />
               </div>
+            )}
+          </motion.section>
+        </div>
 
-              <div className="settings-group toggle">
-                <div>
-                  <label>Recommendations</label>
-                  <p className="field-hint">Get personalized anime recommendations</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={settings.notifications.recommendations}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      notifications: { ...prev.notifications, recommendations: e.target.checked },
-                    }))
-                  }
-                  className="toggle-checkbox"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Privacy Tab */}
-          {activeTab === 'privacy' && (
-            <div>
-              <h2 className="tab-title">Privacy Settings</h2>
-
-              <div className="settings-group toggle">
-                <div>
-                  <label>Public Profile</label>
-                  <p className="field-hint">Allow others to view your profile</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={settings.privacy.publicProfile}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      privacy: { ...prev.privacy, publicProfile: e.target.checked },
-                    }))
-                  }
-                  className="toggle-checkbox"
-                />
-              </div>
-
-              <div className="settings-group toggle">
-                <div>
-                  <label>Allow Recommendations</label>
-                  <p className="field-hint">Let us use your data to improve recommendations</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={settings.privacy.allowRecommendations}
-                  onChange={(e) =>
-                    setSettings(prev => ({
-                      ...prev,
-                      privacy: { ...prev.privacy, allowRecommendations: e.target.checked },
-                    }))
-                  }
-                  className="toggle-checkbox"
-                />
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="settings-actions">
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleSave}
-          className="btn-save"
-        >
-          <Save size={18} />
-          Save Changes
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/profile')}
-          className="btn-cancel"
-        >
-          Cancel
-        </motion.button>
-      </div>
+        <div className="settings-footer">
+          <button className="btn-ghost" onClick={resetDraft} disabled={saving}>
+            Reset
+          </button>
+          <button className="btn-primary" onClick={handleSave} disabled={saving}>
+            <Save size={16} />
+            {saving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      </main>
     </div>
   );
-};
-
-export default SettingsPage;
+}

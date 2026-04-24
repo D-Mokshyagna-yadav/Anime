@@ -20,9 +20,11 @@ export default function CategoryPage() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const page = Math.max(1, Number(params.get('page') || '1'));
+  const urlPage = Math.max(1, Number(params.get('page') || '1'));
+  const routeGenre = genreParam || 'Action';
   const [genres, setGenres] = useState<string[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState<string>(genreParam || 'Action');
+  const [selectedGenre, setSelectedGenre] = useState<string>(routeGenre);
+  const [currentPage, setCurrentPage] = useState(urlPage);
   const [results, setResults] = useState<AniMedia[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -30,8 +32,12 @@ export default function CategoryPage() {
   const title = useMemo(() => `${selectedGenre} Anime`, [selectedGenre]);
 
   useEffect(() => {
-    setSelectedGenre(genreParam || 'Action');
-  }, [genreParam]);
+    setSelectedGenre(routeGenre);
+  }, [routeGenre]);
+
+  useEffect(() => {
+    setCurrentPage(urlPage);
+  }, [urlPage]);
 
   useEffect(() => {
     setPageMeta(title, `Browse ${selectedGenre} anime on SensuiWatch.`);
@@ -70,7 +76,7 @@ export default function CategoryPage() {
   useEffect(() => {
     if (!selectedGenre) return;
     setLoading(true);
-    fetchSearch('', page, selectedGenre)
+    fetchSearch('', currentPage, selectedGenre)
       .then((response) => {
         setResults(response.data.data.media || []);
         setTotalPages(response.data.data.pageInfo?.lastPage || 1);
@@ -79,9 +85,10 @@ export default function CategoryPage() {
         setResults([]);
       })
       .finally(() => setLoading(false));
-  }, [selectedGenre, page]);
+  }, [selectedGenre, currentPage]);
 
   const goPage = (nextPage: number) => {
+    setCurrentPage(nextPage);
     const next = new URLSearchParams(params.toString());
     next.set('page', String(nextPage));
     setParams(next);
@@ -89,7 +96,12 @@ export default function CategoryPage() {
   };
 
   const changeGenre = (genre: string) => {
+    if (genre === selectedGenre && currentPage === 1) return;
+
+    setSelectedGenre(genre);
+    setCurrentPage(1);
     navigate(`/categories/${encodeURIComponent(genre)}?page=1`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -131,11 +143,11 @@ export default function CategoryPage() {
 
         {!loading && totalPages > 1 && (
           <div className="pagination">
-            <button className="page-btn" disabled={page <= 1} onClick={() => goPage(page - 1)}>
+            <button className="page-btn" disabled={currentPage <= 1} onClick={() => goPage(currentPage - 1)}>
               <ChevronLeft size={18} />
             </button>
-            <span className="page-label">Page {page} / {totalPages}</span>
-            <button className="page-btn" disabled={page >= totalPages} onClick={() => goPage(page + 1)}>
+            <span className="page-label">Page {currentPage} / {totalPages}</span>
+            <button className="page-btn" disabled={currentPage >= totalPages} onClick={() => goPage(currentPage + 1)}>
               <ChevronRight size={18} />
             </button>
           </div>

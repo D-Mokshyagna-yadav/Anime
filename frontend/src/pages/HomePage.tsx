@@ -102,7 +102,7 @@ export default function HomePage() {
           <section className="home-section">
             <div className="section-header">
               <h2 className="section-title">Continue Watching</h2>
-              <a href="/" className="see-all">View All <ChevronRight size={16} /></a>
+              <Link to="/continue-watching" className="see-all">View All <ChevronRight size={16} /></Link>
             </div>
             <HorizontalScroller ariaLabel="Continue watching list" className="continue-scroll">
               {watchHistory.map((item, i) => (

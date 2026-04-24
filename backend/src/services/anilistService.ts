@@ -89,6 +89,29 @@ export const getSeasonalAnime = async (season: string, year: number, page = 1) =
 export const getAnimeById = async (id: number) =>
   query<{ Media: AniListMedia }>(`query($id:Int){Media(id:$id,type:ANIME){${MEDIA_FIELDS_WITH_SCHEDULE} characters(role:MAIN,perPage:8){nodes{id name{full}image{medium}}} relations{edges{relationType node{id title{romaji}coverImage{medium}type}}}}}`, { id });
 
+export const getAnimeByIds = async (ids: number[]) => {
+  const uniqueIds = Array.from(new Set(ids.filter((id) => Number.isFinite(id) && id > 0)));
+  if (uniqueIds.length === 0) {
+    return [] as AniListMedia[];
+  }
+
+  const chunks: number[][] = [];
+  for (let index = 0; index < uniqueIds.length; index += 50) {
+    chunks.push(uniqueIds.slice(index, index + 50));
+  }
+
+  const pages = await Promise.all(
+    chunks.map((chunk) =>
+      query<{ Page: { media: AniListMedia[] } }>(
+        `query($ids:[Int]){Page(page:1,perPage:50){media(id_in:$ids,type:ANIME,isAdult:false){${MEDIA_FIELDS_WITH_SCHEDULE}}}}`,
+        { ids: chunk }
+      )
+    )
+  );
+
+  return pages.flatMap((page) => page.Page.media || []);
+};
+
 export const searchAnime = async (search: string, page = 1, genres?: string[], status?: string) =>
   query<AniListPage>(`query($search:String,$page:Int,$genres:[String],$status:MediaStatus){Page(page:$page,perPage:24){media(search:$search,type:ANIME,isAdult:false,genre_in:$genres,genre_not_in:[\"Hentai\"],tag_not_in:[\"Hentai\",\"Adult Content\",\"NSFW\"],status:$status){${MEDIA_FIELDS}}pageInfo{total currentPage lastPage hasNextPage perPage}}}`, { search, page, genres, status });
 

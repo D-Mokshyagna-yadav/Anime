@@ -341,6 +341,29 @@ router.get('/calendar', async (req: Request, res: Response) => {
   }
 });
 
+// GET /api/anime/batch?ids=1,2,3
+router.get('/batch', async (req: Request, res: Response) => {
+  try {
+    const rawIds = String(req.query.ids || '');
+    const ids = rawIds
+      .split(',')
+      .map((value) => Number(value.trim()))
+      .filter((value) => Number.isFinite(value) && value > 0);
+
+    if (ids.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
+
+    const media = hydrateSafeMediaList(await anilist.getAnimeByIds(ids));
+    const mediaMap = new Map(media.map((item) => [item.id, item]));
+    const ordered = ids.map((id) => mediaMap.get(id)).filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+    return res.json({ success: true, data: ordered });
+  } catch (e) {
+    return res.status(500).json({ success: false, message: String(e) });
+  }
+});
+
 // GET /api/anime/:id
 router.get('/:id', async (req: Request, res: Response) => {
   try {

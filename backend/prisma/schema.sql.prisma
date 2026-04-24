@@ -8,12 +8,25 @@ generator client {
 }
 
 model User {
-  id           String      @id @default(cuid())
-  email        String      @unique
-  passwordHash String?
-  createdAt    DateTime    @default(now())
-  watchlists   Watchlist[]
-  reviews      Review[]
+  id                     String         @id @default(cuid())
+  email                  String         @unique
+  passwordHash           String?
+  avatarUrl              String?
+  language               String         @default("en")
+  animeOrder             String         @default("latest")
+  autoPlayNext           Boolean        @default(true)
+  accentTheme            String         @default("violet")
+  fontSize               String         @default("medium")
+  reducedMotion          Boolean        @default(false)
+  notifyNewReleases      Boolean        @default(true)
+  notifyWatchlistUpdates Boolean        @default(true)
+  notifyCommunityPosts   Boolean        @default(false)
+  notifyRecommendations  Boolean        @default(true)
+  publicProfile          Boolean        @default(false)
+  allowRecommendations   Boolean        @default(true)
+  createdAt              DateTime       @default(now())
+  watchlists             Watchlist[]
+  reviews                Review[]
   notifications Notification[]
 }
 

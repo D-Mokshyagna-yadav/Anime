@@ -3,6 +3,7 @@ import { authMiddleware } from '../middleware/authMiddleware';
 import {
   addOrUpdateReview,
   addOrUpdateWatchlist,
+  getAvatarOptions,
   getReviews,
   getWatchlist,
   login,
@@ -25,6 +26,7 @@ router.post('/signup', signup);
 router.post('/login', login);
 
 router.get('/me', authMiddleware, me);
+router.get('/avatar-options', authMiddleware, getAvatarOptions);
 
 router.post('/watchlist', authMiddleware, addOrUpdateWatchlist);
 router.get('/watchlist', authMiddleware, getWatchlist);

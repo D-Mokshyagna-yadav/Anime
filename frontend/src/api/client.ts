@@ -128,6 +128,8 @@ export interface User {
   id: string;
   email: string;
   createdAt?: string;
+  avatarUrl?: string | null;
+  settings?: UserSettings;
 }
 
 export interface Watchlist {
@@ -137,6 +139,7 @@ export interface Watchlist {
   status: 'PLAN_TO_WATCH' | 'WATCHING' | 'COMPLETED' | 'DROPPED' | 'ON_HOLD';
   progress: number;
   updatedAt: string;
+  anime?: AniMedia | null;
 }
 
 export interface Review {
@@ -152,6 +155,8 @@ export interface UserProfile {
   id: string;
   email: string;
   createdAt: string;
+  avatarUrl?: string | null;
+  settings?: UserSettings;
 }
 
 export interface UserStats {
@@ -159,6 +164,38 @@ export interface UserStats {
   watchingCount: number;
   completedCount: number;
   reviewsWritten: number;
+}
+
+export interface UserSettings {
+  preferences: {
+    language: string;
+    animeOrder: string;
+    autoPlayNext: boolean;
+  };
+  display: {
+    accentTheme: 'violet' | 'cyan' | 'sunset';
+    fontSize: 'small' | 'medium' | 'large';
+    reducedMotion: boolean;
+  };
+  notifications: {
+    newReleases: boolean;
+    watchlistUpdates: boolean;
+    communityPosts: boolean;
+    recommendations: boolean;
+  };
+  privacy: {
+    publicProfile: boolean;
+    allowRecommendations: boolean;
+  };
+}
+
+export interface AvatarOption {
+  id: string;
+  url: string;
+  animeName?: string;
+  artistName?: string;
+  artistHref?: string;
+  sourceUrl?: string;
 }
 
 export interface UserNotification {
@@ -188,6 +225,23 @@ export const fetchAnimeById  = (id: number) =>
 
     return response;
   });
+export const fetchAnimeBatch = (ids: Array<number | string>) =>
+  client
+    .get<{ data: AniMedia[] }>('/anime/batch', {
+      params: {
+        ids: ids
+          .map((id) => Number(id))
+          .filter((id) => Number.isFinite(id) && id > 0)
+          .join(','),
+      },
+    })
+    .then((response) => ({
+      ...response,
+      data: {
+        ...response.data,
+        data: (response.data.data || []).filter(isSafeAnime),
+      },
+    }));
 export const fetchSearch     = (q: string, page = 1, genre?: string, status?: string) =>
   client.get<{ data: AniPage }>('/anime/search', { params: { q, page, genre, status } }).then((response) => ({ ...response, data: { ...response.data, data: sanitizeAnimePage(response.data.data) } }));
 export const fetchEpisodes = (
@@ -273,8 +327,15 @@ export const reviewDelete = (animeId: string) =>
 export const profileGet = () =>
   client.get<{ success: boolean; user: UserProfile; stats: UserStats }>('/user/profile');
 
-export const profileUpdate = (currentPassword?: string, newPassword?: string) =>
-  client.put<{ success: boolean; message: string }>('/user/profile', { currentPassword, newPassword });
+export const profileUpdate = (payload: {
+  currentPassword?: string;
+  newPassword?: string;
+  avatarUrl?: string | null;
+  settings?: Partial<UserSettings>;
+}) => client.put<{ success: boolean; message: string; user: UserProfile }>('/user/profile', payload);
+
+export const avatarOptionsGet = (amount = 24) =>
+  client.get<{ success: boolean; options: AvatarOption[] }>('/user/avatar-options', { params: { amount } });
 
 // Notifications API
 export const notificationsGet = (limit = 25) =>

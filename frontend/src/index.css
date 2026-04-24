@@ -29,6 +29,7 @@
   --topbar-height: clamp(56px, 7vh, 78px);
   --adaptive-grid-columns: 4;
   --adaptive-ui-scale: 1;
+  --user-font-scale: 1;
   --space-1: clamp(0.4rem, 0.35rem + 0.3vw, 0.75rem);
   --space-2: clamp(0.65rem, 0.55rem + 0.4vw, 1rem);
   --space-3: clamp(0.9rem, 0.75rem + 0.5vw, 1.35rem);
@@ -59,7 +60,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  font-size: calc(16px * var(--adaptive-ui-scale));
+  font-size: calc(16px * var(--adaptive-ui-scale) * var(--user-font-scale));
 }
 
 a { color: inherit; text-decoration: none; }
@@ -244,4 +245,27 @@ body.device-tv .h-scroll {
 
 body.device-tv .h-scroll > * {
   min-width: 0;
+}
+
+:root[data-accent-theme='cyan'] {
+  --primary: #06b6d4;
+  --primary-dim: #cffafe;
+  --primary-dark: #0e7490;
+  --secondary: #38bdf8;
+}
+
+:root[data-accent-theme='sunset'] {
+  --primary: #f97316;
+  --primary-dim: #ffedd5;
+  --primary-dark: #c2410c;
+  --secondary: #fb7185;
+}
+
+:root[data-motion-preference='reduced'] *,
+:root[data-motion-preference='reduced'] *::before,
+:root[data-motion-preference='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../api/client';
 import { authLogin, authSignup, authGetMe } from '../api/client';
+import { applyUserSettingsToDocument, loadStoredUserSettings } from '../utils/userPreferences';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,14 +20,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const refreshUser = async () => {
+    const response = await authGetMe();
+    setUser(response.data.user);
+    applyUserSettingsToDocument(response.data.user.settings);
+  };
+
   // Check if user is logged in on mount
   useEffect(() => {
+    applyUserSettingsToDocument(loadStoredUserSettings());
+
     const checkAuth = async () => {
       const token = localStorage.getItem('authToken');
       if (token) {
         try {
-          const response = await authGetMe();
-          setUser(response.data.user);
+          await refreshUser();
         } catch {
           localStorage.removeItem('authToken');
         }
@@ -42,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     localStorage.setItem('authToken', response.data.token);
-    setUser(response.data.user);
+    await refreshUser();
   };
 
   const signup = async (email: string, password: string) => {
@@ -52,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     localStorage.setItem('authToken', response.data.token);
-    setUser(response.data.user);
+    await refreshUser();
   };
 
   const logout = () => {
@@ -61,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthenticated: !!user, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, loading, isAuthenticated: !!user, login, signup, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,9 +6,12 @@ import {
   deleteWatchlistEntry,
   findUserByEmail,
   getUserWithStats,
+  listAvatarOptions,
   listReviews,
   listWatchlist,
+  listWatchlistWithAnime,
   patchWatchlist,
+  serializeUser,
   updateProfile,
   upsertReview,
   upsertWatchlist,
@@ -39,7 +42,7 @@ export async function signup(req: Request, res: Response) {
 
     const user = await createUser({ email: normalizedEmail, password });
     const token = generateToken(user.id, user.email);
-    return res.json({ success: true, token, user: { id: user.id, email: user.email } });
+    return res.json({ success: true, token, user: serializeUser(user) });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
@@ -74,7 +77,7 @@ export async function login(req: Request, res: Response) {
     }
 
     const token = generateToken(user.id, user.email);
-    return res.json({ success: true, token, user: { id: user.id, email: user.email } });
+    return res.json({ success: true, token, user: serializeUser(user) });
   } catch (error) {
     return res.status(500).json({ success: false, message: String(error) });
   }
@@ -90,11 +93,7 @@ export async function me(req: Request, res: Response) {
 
     return res.json({
       success: true,
-      user: {
-        id: result.user.id,
-        email: result.user.email,
-        createdAt: result.user.createdAt,
-      },
+      user: serializeUser(result.user),
       watchlistCount: result.user.watchlists.length,
       reviewCount: result.user.reviews.length,
     });
@@ -124,7 +123,8 @@ export async function getWatchlist(req: Request, res: Response) {
     if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
 
     const status = req.query.status ? String(req.query.status) : undefined;
-    const watchlist = await listWatchlist(userId, status);
+    const includeAnime = req.query.includeAnime !== '0';
+    const watchlist = includeAnime ? await listWatchlistWithAnime(userId, status) : await listWatchlist(userId, status);
     return res.json({ success: true, watchlist });
   } catch (error) {
     return res.status(500).json({ success: false, message: String(error) });
@@ -217,11 +217,7 @@ export async function profile(req: Request, res: Response) {
 
     return res.json({
       success: true,
-      user: {
-        id: result.user.id,
-        email: result.user.email,
-        createdAt: result.user.createdAt,
-      },
+      user: serializeUser(result.user),
       stats: result.stats,
     });
   } catch (error) {
@@ -234,11 +230,11 @@ export async function updateUserProfile(req: Request, res: Response) {
     const userId = getRequiredUserId(req);
     if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
 
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword, newPassword, avatarUrl, settings } = req.body;
 
     try {
-      const result = await updateProfile(userId, { currentPassword, newPassword });
-      return res.json({ success: true, message: result.message });
+      const result = await updateProfile(userId, { currentPassword, newPassword, avatarUrl, settings });
+      return res.json({ success: true, message: result.message, user: result.user });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       const status = message.includes('Invalid current password') || message.includes('Current password required') ? 401 : 400;
@@ -307,6 +303,16 @@ export async function removeAllNotifications(req: Request, res: Response) {
 
     const result = await clearAllNotifications(userId);
     return res.json({ success: true, removed: result.removed });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: String(error) });
+  }
+}
+
+export async function getAvatarOptions(req: Request, res: Response) {
+  try {
+    const amount = req.query.amount ? Number(req.query.amount) : 24;
+    const options = await listAvatarOptions(amount);
+    return res.json({ success: true, options });
   } catch (error) {
     return res.status(500).json({ success: false, message: String(error) });
   }

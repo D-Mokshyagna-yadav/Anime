@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Hls from 'hls.js';
-import { ChevronLeft, ChevronRight, List, AlertCircle, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, List, AlertCircle, Loader2, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import { useAdaptive } from '../context/AdaptiveContext';
@@ -17,6 +17,7 @@ import { getEpisodeCountLabel, getExpectedEpisodeCount } from '../utils/anime';
 import { buildEpisodePlaceholders, getEpisodeLookupParams } from '../utils/episodes';
 import { applyImageFallback, getAnimeThumbImage } from '../utils/images';
 import { logError } from '../utils/logger';
+import { loadStoredUserSettings } from '../utils/userPreferences';
 import './WatchPage.css';
 
 interface Episode {
@@ -132,7 +133,7 @@ export default function WatchPage() {
   const [epPanelOpen, setEpPanelOpen] = useState(false);
   const [provider, setProvider] = useState<Provider>('megaplay');
   const [language, setLanguage] = useState<'sub' | 'dub'>('sub');
-  const [autoNext, setAutoNext] = useState(true);
+  const [autoNext, setAutoNext] = useState(() => loadStoredUserSettings().preferences.autoPlayNext);
   const [embedUrl, setEmbedUrl] = useState('');
   const { deviceType, inputType } = useAdaptive();
 
@@ -146,6 +147,7 @@ export default function WatchPage() {
   const episodeCountLabel = getEpisodeCountLabel(anime);
 
   const goEpisode = (episode: Episode) => {
+    setEpPanelOpen(false);
     navigate(`/watch/${animeId}/${encodeURIComponent(episode.id)}`);
   };
 
@@ -437,15 +439,14 @@ export default function WatchPage() {
                 {embedUrl && !playerError && (
                   <iframe
                     src={embedUrl}
-                    width="100%"
-                    height="100%"
+                    className="player-frame"
                     frameBorder="0"
                     scrolling="no"
                     allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                     allowFullScreen
                     title={`Video player for ${title} episode ${currentEpNum}`}
                     referrerPolicy="origin-when-cross-origin"
-                    style={{ minHeight: 500, display: playerError ? 'none' : 'block' }}
+                    style={{ display: playerError ? 'none' : 'block' }}
                   />
                 )}
               </>
@@ -470,7 +471,7 @@ export default function WatchPage() {
 
                 <video
                   ref={videoRef}
-                  className="player-video"
+                  className="player-video player-frame"
                   controls
                   playsInline
                   muted={deviceType === 'mobile'}
@@ -567,8 +568,8 @@ export default function WatchPage() {
         <div className={`watch-sidebar ${epPanelOpen ? 'open' : ''}`}>
           <div className="sidebar-header">
             <h3>Episodes</h3>
-            <button className="icon-btn" onClick={() => setEpPanelOpen(false)}>
-              x
+            <button className="icon-btn sidebar-close-btn" onClick={() => setEpPanelOpen(false)} aria-label="Close episode list">
+              <X size={18} />
             </button>
           </div>
           <div className="ep-list">

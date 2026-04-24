@@ -26,7 +26,20 @@ const DEFAULT_ANIME_IMAGE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox
   <text x="300" y="710" text-anchor="middle" fill="#e9d5ff" font-family="Arial, sans-serif" font-size="28">Image unavailable</text>
 </svg>`;
 
+const DEFAULT_PROFILE_AVATAR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="avatarBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="240" rx="120" fill="#0f172a"/>
+  <circle cx="120" cy="92" r="44" fill="url(#avatarBg)" opacity="0.85"/>
+  <path d="M56 196c0-35.346 28.654-64 64-64s64 28.654 64 64" fill="url(#avatarBg)" opacity="0.85"/>
+</svg>`;
+
 export const DEFAULT_ANIME_IMAGE = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(DEFAULT_ANIME_IMAGE_SVG)}`;
+export const DEFAULT_PROFILE_AVATAR = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(DEFAULT_PROFILE_AVATAR_SVG)}`;
 
 const firstImage = (...images: Array<string | null | undefined>) =>
   images.find((image): image is string => typeof image === 'string' && image.trim().length > 0)?.trim() || DEFAULT_ANIME_IMAGE;

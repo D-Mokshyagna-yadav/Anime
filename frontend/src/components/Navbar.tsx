@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bell,
+  CalendarDays,
   Home,
   ListVideo,
+  LogIn,
   LogOut,
   Menu,
   PlayCircle,
@@ -52,6 +54,7 @@ export default function Navbar() {
     { to: '/', label: 'Home', icon: Home },
     { to: '/search?sort=trending', label: 'Trending', icon: ListVideo },
     { to: '/search?sort=latest', label: 'Latest', icon: ListVideo },
+    { to: '/season', label: 'Season', icon: CalendarDays },
     { to: '/categories/Action', label: 'Categories', icon: ListVideo },
     { to: '/notifications', label: 'Notifications', icon: Bell },
     { to: '/search', label: 'Search', icon: Search },
@@ -61,6 +64,7 @@ export default function Navbar() {
     { to: '/', label: 'Home' },
     { to: '/search?sort=trending', label: 'Trending' },
     { to: '/search?sort=latest', label: 'Latest' },
+    { to: '/season', label: 'Season' },
     { to: '/categories/Action', label: 'Categories' },
   ];
 
@@ -311,11 +315,7 @@ export default function Navbar() {
             )}
 
             {!searchOpen && (
-              <button
-                className="icon-btn"
-                onClick={() => setSearchOpen(true)}
-                aria-label="Open search"
-              >
+              <button className="icon-btn" onClick={() => setSearchOpen(true)} aria-label="Open search">
                 <Search size={20} />
               </button>
             )}
@@ -390,7 +390,12 @@ export default function Navbar() {
                   </div>
                 </div>
               </>
-            ) : null}
+            ) : (
+              <Link to="/login" className="btn-ghost navbar-auth-link" aria-label="Login">
+                <LogIn size={16} />
+                <span>Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </nav>
