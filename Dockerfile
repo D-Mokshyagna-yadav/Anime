@@ -15,7 +15,7 @@ COPY frontend/package.json frontend/package-lock.json ./frontend/
 # Copy full source code before npm ci (needed for workspaces to resolve)
 COPY . .
 
-# Install all dependencies for root, backend, and frontend workspaces
+# Install all dependencies for root, backend, and frontend workspaces (including devDependencies)
 RUN npm ci
 
 # Install all native bindings explicitly
