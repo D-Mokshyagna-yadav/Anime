@@ -13,6 +13,7 @@ RUN npm ci
 COPY . .
 
 RUN npm install
+RUN npm install --include=optional --workspace=frontend
 RUN npm run build
 RUN npm prune --omit=dev
 
