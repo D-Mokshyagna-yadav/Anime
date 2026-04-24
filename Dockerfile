@@ -44,18 +44,17 @@ ENV PORT=5000
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/package-lock.json ./backend/
 
-# Copy Prisma schema and migrations before installing dependencies
-COPY backend/prisma ./backend/prisma
-
 # Install only production dependencies for backend
 RUN npm ci --workspace=backend --omit=dev --legacy-peer-deps
 
-# Generate Prisma client in production environment
-RUN npx prisma generate --schema=./backend/prisma/schema.prisma
+# Copy pre-generated Prisma client from builder stage
+COPY --from=builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
+COPY --from=builder /app/backend/node_modules/@prisma ./backend/node_modules/@prisma
 
 # Copy built backend and frontend
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/frontend/dist ./frontend/dist
+COPY --from=builder /app/backend/prisma ./backend/prisma
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
