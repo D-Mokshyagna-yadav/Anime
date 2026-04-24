@@ -51,12 +51,16 @@ RUN npm ci --workspace=backend --omit=dev --legacy-peer-deps
 
 # Install Prisma CLI and engines in the production image so runtime provider-specific
 # generation can run without downloading tools on startup.
-RUN npm install --workspace=backend --no-save prisma@5.22.0 @prisma/engines@5.22.0
+RUN npm install --workspace=backend --no-save prisma@5.22.0 @prisma/engines@5.22.0 && \
+    npm rebuild --workspace=backend
 
 # Copy pre-generated Prisma client from builder stage
 COPY --from=builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
 COPY --from=builder /app/backend/node_modules/@prisma ./backend/node_modules/@prisma
 COPY --from=builder /root/.cache/prisma /root/.cache/prisma
+
+# Also copy the bin directory for prisma CLI
+COPY --from=builder /app/backend/node_modules/.bin ./backend/node_modules/.bin
 
 # Copy built backend and frontend
 COPY --from=builder /app/backend/dist ./backend/dist
@@ -66,4 +70,4 @@ COPY --from=builder /app/backend/scripts ./backend/scripts
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && ./backend/node_modules/.bin/prisma generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]
+CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && npx prisma generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]
