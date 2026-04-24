@@ -1,7 +1,23 @@
 import axios from 'axios';
 
+// Determine API base URL
+// In production (Docker), frontend and backend are on same origin
+// In development, frontend is on :5173, backend is on :5000
+const getApiBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) return envUrl;
+  
+  // If we're in development and the request would fail, try localhost:5000
+  if (import.meta.env.DEV) {
+    return 'http://localhost:5000/api';
+  }
+  
+  // In production, use relative path (backend serves frontend on same origin)
+  return '/api';
+};
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: getApiBaseUrl(),
   timeout: 12000,
 });
 
