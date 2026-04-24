@@ -40,11 +40,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certifi
 ENV NODE_ENV=production
 ENV PORT=5000
 
-# Copy all node_modules (dotenv is needed at runtime)
-COPY --from=builder /app/node_modules ./node_modules
+# Copy package files for production dependency resolution
+COPY package.json package-lock.json ./
+COPY backend/package.json backend/package-lock.json ./backend/
+
+# Install only production dependencies for backend
+RUN npm ci --workspace=backend --omit=dev --legacy-peer-deps
+
+# Copy built backend and frontend
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/frontend/dist ./frontend/dist
 COPY --from=builder /app/backend/prisma ./backend/prisma
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/api/health || exit 1
 
 EXPOSE 5000
 

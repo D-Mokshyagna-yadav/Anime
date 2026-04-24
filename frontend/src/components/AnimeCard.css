@@ -4,9 +4,15 @@
   flex-shrink: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.card-link:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+.card-link:active {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+@media (min-width: 768px) {
+  .card-link:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+  }
 }
 
 .card-poster {
@@ -38,16 +44,23 @@
   justify-content: center;
   transition: background 0.25s ease;
 }
-.anime-card:hover .card-overlay { 
-  background: rgba(0,0,0,0.45); 
+@media (min-width: 768px) {
+  .anime-card:hover .card-overlay { 
+    background: rgba(0,0,0,0.45); 
+  }
+}
+@media (max-width: 767px) {
+  .anime-card:active .card-overlay { 
+    background: rgba(0,0,0,0.4); 
+  }
 }
 
 .play-btn {
   display: flex; 
   align-items: center; 
   justify-content: center;
-  width: 50px; 
-  height: 50px; 
+  width: clamp(40px, 8vw, 50px); 
+  height: clamp(40px, 8vw, 50px); 
   border-radius: 50%;
   background: var(--primary);
   border: none;
@@ -58,9 +71,17 @@
   color: white;
   box-shadow: 0 0 20px rgba(124,58,237,0.6);
 }
-.anime-card:hover .play-btn { 
-  opacity: 1; 
-  transform: scale(1); 
+@media (min-width: 768px) {
+  .anime-card:hover .play-btn { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+@media (max-width: 767px) {
+  .anime-card:active .play-btn { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
 }
 .play-btn:hover {
   filter: brightness(1.1);
@@ -68,37 +89,41 @@
 
 .card-badge {
   position: absolute; 
-  font-size: 0.68rem; 
+  font-size: clamp(0.6rem, 1vw, 0.68rem); 
   font-weight: 700;
-  padding: 4px 10px; 
+  padding: 3px 8px; 
   border-radius: 6px; 
   letter-spacing: 0.05em;
 }
+@media (min-width: 480px) { .card-badge { padding: 4px 10px; } }
 .card-badge.new { 
-  top: 8px; 
-  right: 8px; 
+  top: 6px; 
+  right: 6px; 
   background: var(--primary); 
   color: white;
   box-shadow: 0 2px 8px rgba(124,58,237,0.4);
 }
+@media (min-width: 480px) { .card-badge.new { top: 8px; right: 8px; } }
 .card-badge.format { 
-  top: 8px; 
-  left: 8px; 
+  top: 6px; 
+  left: 6px; 
   background: rgba(0,0,0,0.7); 
   color: var(--text-muted); 
   backdrop-filter: blur(4px); 
 }
+@media (min-width: 480px) { .card-badge.format { top: 8px; left: 8px; } }
 
 .card-info {
-  padding: 12px 12px 14px;
+  padding: 10px 10px 12px;
   background: var(--bg-card);
   border-radius: 0 0 12px 12px;
   display: flex; 
   flex-direction: column; 
-  gap: 6px;
+  gap: 4px;
 }
+@media (min-width: 480px) { .card-info { padding: 12px 12px 14px; gap: 6px; } }
 .card-title {
-  font-size: 0.82rem; 
+  font-size: clamp(0.75rem, 1.5vw, 0.82rem); 
   font-weight: 600; 
   color: var(--text);
   line-height: 1.35;
@@ -111,11 +136,11 @@
   display: inline-flex; 
   align-items: center; 
   gap: 4px;
-  font-size: 0.75rem; 
+  font-size: clamp(0.65rem, 1vw, 0.75rem); 
   font-weight: 700; 
   color: var(--warning);
 }
 .card-genre {
-  font-size: 0.7rem; 
+  font-size: clamp(0.6rem, 0.9vw, 0.7rem); 
   color: var(--text-faint);
 }

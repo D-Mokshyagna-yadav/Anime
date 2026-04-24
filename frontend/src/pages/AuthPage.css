@@ -5,10 +5,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 16px;
   position: relative;
   overflow: hidden;
 }
+@media (min-width: 480px) { .auth-bg { padding: 20px; } }
+@media (min-width: 768px) { .auth-bg { padding: 24px; } }
 
 /* Animated background blobs */
 .auth-blob {
@@ -19,23 +21,70 @@
   z-index: 0;
 }
 .blob-1 {
-  width: 500px; height: 500px;
+  width: 300px; height: 300px;
   background: radial-gradient(circle, rgba(124,58,237,0.25), transparent 70%);
-  top: -150px; left: -150px;
+  top: -100px; left: -100px;
   animation: blobFloat 8s ease-in-out infinite;
 }
+@media (min-width: 480px) { 
+  .blob-1 { 
+    width: 350px; 
+    height: 350px; 
+    top: -120px; 
+    left: -120px; 
+  } 
+}
+@media (min-width: 768px) { 
+  .blob-1 { 
+    width: 500px; 
+    height: 500px; 
+    top: -150px; 
+    left: -150px; 
+  } 
+}
+
 .blob-2 {
-  width: 400px; height: 400px;
+  width: 250px; height: 250px;
   background: radial-gradient(circle, rgba(90,0,198,0.2), transparent 70%);
-  bottom: -100px; right: -100px;
+  bottom: -80px; right: -80px;
   animation: blobFloat 10s ease-in-out infinite reverse;
 }
+@media (min-width: 480px) { 
+  .blob-2 { 
+    width: 300px; 
+    height: 300px; 
+    bottom: -90px; 
+    right: -90px; 
+  } 
+}
+@media (min-width: 768px) { 
+  .blob-2 { 
+    width: 400px; 
+    height: 400px; 
+    bottom: -100px; 
+    right: -100px; 
+  } 
+}
+
 .blob-3 {
-  width: 300px; height: 300px;
+  width: 200px; height: 200px;
   background: radial-gradient(circle, rgba(124,58,237,0.12), transparent 70%);
   top: 50%; left: 50%; transform: translate(-50%, -50%);
   animation: blobFloat 12s ease-in-out infinite 2s;
 }
+@media (min-width: 480px) { 
+  .blob-3 { 
+    width: 250px; 
+    height: 250px; 
+  } 
+}
+@media (min-width: 768px) { 
+  .blob-3 { 
+    width: 300px; 
+    height: 300px; 
+  } 
+}
+
 @keyframes blobFloat {
   0%, 100% { transform: translateY(0) scale(1); }
   50%       { transform: translateY(-30px) scale(1.05); }
@@ -43,16 +92,20 @@
 
 /* ── Form Group ───────────────────────────────────── */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
+@media (min-width: 480px) { .form-group { margin-bottom: 18px; } }
+@media (min-width: 768px) { .form-group { margin-bottom: 20px; } }
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
-  font-size: 0.875rem;
+  margin-bottom: 6px;
+  font-size: clamp(0.8rem, 1vw, 0.875rem);
   font-weight: 500;
   opacity: 0.9;
 }
+@media (min-width: 480px) { .form-group label { margin-bottom: 7px; } }
+@media (min-width: 768px) { .form-group label { margin-bottom: 8px; } }
 
 .input-icon-wrapper {
   position: relative;
@@ -61,9 +114,11 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   transition: all 0.3s ease;
 }
+@media (min-width: 480px) { .input-icon-wrapper { padding: 9px 11px; } }
+@media (min-width: 768px) { .input-icon-wrapper { padding: 10px 12px; } }
 
 .input-icon-wrapper:focus-within {
   background: rgba(255, 255, 255, 0.08);
@@ -72,21 +127,25 @@
 
 .input-icon-wrapper svg {
   position: absolute;
-  left: 12px;
+  left: 10px;
   opacity: 0.6;
   flex-shrink: 0;
+  font-size: 0.9rem;
 }
+@media (min-width: 768px) { .input-icon-wrapper svg { left: 12px; } }
 
 .input-icon-wrapper input {
   flex: 1;
   background: none;
   border: none;
   color: white;
-  padding-left: 32px;
-  padding-right: 40px;
-  font-size: 0.95rem;
+  padding-left: 28px;
+  padding-right: 36px;
+  font-size: clamp(0.85rem, 1.2vw, 0.95rem);
   outline: none;
 }
+@media (min-width: 480px) { .input-icon-wrapper input { padding-left: 30px; padding-right: 38px; } }
+@media (min-width: 768px) { .input-icon-wrapper input { padding-left: 32px; padding-right: 40px; } }
 
 .input-icon-wrapper input::placeholder {
   color: rgba(255, 255, 255, 0.4);

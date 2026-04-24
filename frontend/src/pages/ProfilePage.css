@@ -18,15 +18,17 @@
   min-height: 100vh;
   background-color: var(--background);
   color: var(--on-surface);
-  margin-top: 80px;
+  margin-top: 70px;
 }
+@media (min-width: 480px) { .profile-container { margin-top: 75px; } }
+@media (min-width: 768px) { .profile-container { margin-top: 80px; } }
 
 /* Banner Section */
 .profile-banner {
   position: relative;
-  height: 250px;
+  height: clamp(150px, 30vh, 250px);
   overflow: hidden;
-  margin-bottom: -60px;
+  margin-bottom: clamp(-40px, -8vw, -60px);
 }
 
 .banner-image {
@@ -49,9 +51,11 @@
 .profile-header {
   position: relative;
   z-index: 2;
-  padding: 0 2rem 2rem;
+  padding: 0 1rem 1.5rem;
   background: linear-gradient(180deg, var(--surface-container) 0%, var(--background) 100%);
 }
+@media (min-width: 480px) { .profile-header { padding: 0 1.5rem 1.75rem; } }
+@media (min-width: 768px) { .profile-header { padding: 0 2rem 2rem; } }
 
 .header-content {
   max-width: 1200px;
@@ -59,31 +63,38 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 2rem;
+  gap: 1.2rem;
+  flex-wrap: wrap;
 }
+@media (min-width: 480px) { .header-content { gap: 1.5rem; } }
+@media (min-width: 768px) { .header-content { gap: 2rem; } }
 
 .profile-avatar-section {
   display: flex;
   align-items: flex-start;
-  gap: 1.5rem;
+  gap: 1rem;
   flex: 1;
+  min-width: clamp(200px, 100%, 400px);
 }
+@media (min-width: 480px) { .profile-avatar-section { gap: 1.2rem; } }
+@media (min-width: 768px) { .profile-avatar-section { gap: 1.5rem; } }
 
 .profile-avatar {
-  width: 120px;
-  height: 120px;
+  width: clamp(80px, 15vw, 120px);
+  height: clamp(80px, 15vw, 120px);
   border-radius: 50%;
   border: 3px solid var(--primary);
   object-fit: cover;
   box-shadow: 0 0 20px rgba(222, 142, 255, 0.2);
+  flex-shrink: 0;
 }
 
 .profile-info {
-  padding-top: 0.5rem;
+  padding-top: 0.3rem;
 }
 
 .profile-username {
-  font-size: 2rem;
+  font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 700;
   margin: 0 0 0.25rem 0;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -93,7 +104,7 @@
 }
 
 .profile-email {
-  font-size: 1rem;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
   color: var(--on-surface-variant);
   margin: 0.25rem 0;
 }

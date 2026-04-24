@@ -1,48 +1,59 @@
 .watchlist-container {
-  margin-top: 80px;
-  padding: 40px 20px;
+  margin-top: 70px;
+  padding: 24px 12px;
 }
+@media (min-width: 480px) { .watchlist-container { margin-top: 75px; padding: 28px 16px; } }
+@media (min-width: 768px) { .watchlist-container { margin-top: 80px; padding: 40px 20px; } }
 
 .watchlist-header {
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
+@media (min-width: 480px) { .watchlist-header { margin-bottom: 32px; } }
+@media (min-width: 768px) { .watchlist-header { margin-bottom: 40px; } }
 
 .watchlist-header h1 {
-  font-size: 2rem;
-  margin-bottom: 8px;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin-bottom: 6px;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+@media (min-width: 480px) { .watchlist-header h1 { margin-bottom: 7px; } }
+@media (min-width: 768px) { .watchlist-header h1 { margin-bottom: 8px; } }
 
 .watchlist-header p {
   opacity: 0.6;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
 }
 
 .watchlist-error {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px;
+  padding: 12px;
   background: rgba(255, 100, 100, 0.1);
   border: 1px solid rgba(255, 100, 100, 0.3);
   border-radius: 8px;
   color: #ff6464;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  font-size: clamp(0.8rem, 1.2vw, 0.9rem);
 }
+@media (min-width: 480px) { .watchlist-error { padding: 14px; margin-bottom: 18px; } }
+@media (min-width: 768px) { .watchlist-error { padding: 16px; margin-bottom: 20px; } }
 
 .watchlist-filters {
   display: flex;
-  gap: 12px;
-  margin-bottom: 30px;
+  gap: 8px;
+  margin-bottom: 20px;
   overflow-x: auto;
-  padding-bottom: 10px;
+  padding-bottom: 8px;
 }
+@media (min-width: 480px) { .watchlist-filters { gap: 9px; margin-bottom: 24px; padding-bottom: 9px; } }
+@media (min-width: 768px) { .watchlist-filters { gap: 12px; margin-bottom: 30px; padding-bottom: 10px; } }
 
 .filter-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: transparent;
   border-radius: 8px;
@@ -50,12 +61,16 @@
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.3s ease;
-  font-size: 0.875rem;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
 }
-
-.filter-btn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+@media (min-width: 480px) { .filter-btn { padding: 7px 13px; } }
+@media (min-width: 768px) { .filter-btn { padding: 8px 16px; } }
+.filter-btn:active { border-color: var(--primary); color: var(--primary); }
+@media (min-width: 768px) {
+  .filter-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
 }
 
 .filter-btn.active {
@@ -65,20 +80,26 @@
 }
 
 .watchlist-group {
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
+@media (min-width: 480px) { .watchlist-group { margin-bottom: 32px; } }
+@media (min-width: 768px) { .watchlist-group { margin-bottom: 40px; } }
 
 .group-title {
-  font-size: 1.25rem;
-  margin-bottom: 20px;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  margin-bottom: 14px;
   opacity: 0.8;
 }
+@media (min-width: 480px) { .group-title { margin-bottom: 16px; } }
+@media (min-width: 768px) { .group-title { margin-bottom: 20px; } }
 
 .watchlist-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
 }
+@media (min-width: 480px) { .watchlist-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; } }
+@media (min-width: 768px) { .watchlist-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; } }
 
 .watchlist-item {
   background: rgba(255, 255, 255, 0.05);

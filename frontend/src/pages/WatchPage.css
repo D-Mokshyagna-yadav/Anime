@@ -3,22 +3,54 @@
 
 .watch-layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 24px;
-  padding-top: 80px;
-  padding-bottom: 60px;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding-top: 70px;
+  padding-bottom: 40px;
+  padding-left: 12px;
+  padding-right: 12px;
   align-items: start;
+}
+@media (min-width: 480px) {
+  .watch-layout {
+    padding-top: 75px;
+    padding-bottom: 45px;
+    padding-left: 16px;
+    padding-right: 16px;
+    gap: 18px;
+  }
+}
+@media (min-width: 768px) {
+  .watch-layout {
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    padding-top: 80px;
+    padding-bottom: 60px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  .watch-layout {
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
 }
 
 /* ── Breadcrumb ───────────────────────────────────── */
 .watch-breadcrumb {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.82rem;
+  gap: 6px;
+  font-size: clamp(0.7rem, 1vw, 0.82rem);
   color: var(--text-faint);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
 }
+@media (min-width: 480px) { .watch-breadcrumb { gap: 7px; margin-bottom: 12px; } }
+@media (min-width: 768px) { .watch-breadcrumb { gap: 8px; margin-bottom: 14px; } }
 .watch-breadcrumb a { color: var(--text-muted); transition: color 0.15s; }
 .watch-breadcrumb a:hover { color: var(--primary-dim); }
 .watch-breadcrumb span { opacity: 0.5; }
@@ -29,7 +61,7 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   background: #000;
-  border-radius: var(--radius);
+  border-radius: clamp(6px, 1vw, 12px);
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,0.7);
 }
@@ -69,56 +101,73 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
   flex-wrap: wrap;
 }
+@media (min-width: 480px) { .player-controls-bar { gap: 10px; margin-top: 12px; } }
+@media (min-width: 768px) { .player-controls-bar { gap: 12px; margin-top: 14px; } }
 
 .ep-nav-btns {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
+@media (min-width: 480px) { .ep-nav-btns { gap: 7px; } }
+@media (min-width: 768px) { .ep-nav-btns { gap: 8px; } }
 
 .ep-nav-btn {
-  padding: 8px 16px;
-  font-size: 0.85rem;
+  padding: 7px 12px;
+  font-size: clamp(0.7rem, 1vw, 0.85rem);
   display: flex;
   align-items: center;
   gap: 4px;
 }
+@media (min-width: 480px) { .ep-nav-btn { padding: 8px 14px; } }
+@media (min-width: 768px) { .ep-nav-btn { padding: 8px 16px; } }
 .ep-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .ep-label {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: clamp(0.75rem, 1.5vw, 0.95rem);
   color: var(--text);
-  padding: 0 8px;
+  padding: 0 6px;
 }
+@media (min-width: 480px) { .ep-label { padding: 0 7px; } }
+@media (min-width: 768px) { .ep-label { padding: 0 8px; } }
 
 .quality-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
-  padding: 8px 12px;
+  padding: 6px 8px;
   background: rgba(124,58,237,0.05);
   border-radius: var(--radius-sm);
   border: 1px solid rgba(124,58,237,0.2);
 }
+@media (min-width: 480px) { .quality-row { padding: 7px 10px; gap: 5px; } }
+@media (min-width: 768px) { .quality-row { padding: 8px 12px; gap: 6px; } }
 
 .quality-btn {
-  padding: 6px 14px;
+  padding: 4px 10px;
   border-radius: 99px;
   background: var(--bg-card);
   border: 1px solid var(--outline);
   color: var(--text-muted);
-  font-size: 0.78rem;
+  font-size: clamp(0.65rem, 0.9vw, 0.78rem);
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
+  white-space: nowrap;
 }
-.quality-btn:hover { background: var(--bg-high); color: var(--text); }
+@media (min-width: 480px) { .quality-btn { padding: 5px 12px; } }
+@media (min-width: 768px) { .quality-btn { padding: 6px 14px; } }
+.quality-btn:active { background: var(--bg-high); color: var(--text); }
+@media (min-width: 768px) {
+  .quality-btn:hover { background: var(--bg-high); color: var(--text); }
+}
 .quality-btn.active {
   background: rgba(124,58,237,0.3);
   border-color: var(--primary);
@@ -127,7 +176,7 @@
 }
 
 .quality-label {
-  font-size: 0.75rem;
+  font-size: clamp(0.6rem, 0.85vw, 0.75rem);
   color: var(--text-faint);
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -138,16 +187,19 @@
 /* ── Watch info strip ─────────────────────────────── */
 .watch-info-strip {
   display: flex;
-  gap: 16px;
-  margin-top: 24px;
-  padding: 20px;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px;
   background: var(--bg-card);
   border-radius: var(--radius);
   border: 1px solid var(--outline);
+  flex-wrap: wrap;
 }
+@media (min-width: 480px) { .watch-info-strip { gap: 14px; padding: 16px; margin-top: 18px; } }
+@media (min-width: 768px) { .watch-info-strip { gap: 16px; padding: 20px; margin-top: 24px; } }
 
 .watch-thumb {
-  width: 64px;
+  width: 50px;
   height: 90px;
   border-radius: 8px;
   object-fit: cover;

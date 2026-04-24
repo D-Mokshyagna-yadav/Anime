@@ -17,19 +17,23 @@
   min-height: 100vh;
   background-color: var(--background);
   color: var(--on-surface);
-  padding-top: 80px;
+  padding-top: 70px;
 }
+@media (min-width: 480px) { .season-container { padding-top: 75px; } }
+@media (min-width: 768px) { .season-container { padding-top: 80px; } }
 
 /* Header */
 .season-header {
-  padding: 3rem 2rem;
+  padding: 2rem 1rem;
   text-align: center;
   background: linear-gradient(135deg, rgba(222, 142, 255, 0.05) 0%, rgba(0, 227, 253, 0.05) 100%);
   border-bottom: 1px solid rgba(70, 71, 82, 0.3);
 }
+@media (min-width: 480px) { .season-header { padding: 2.5rem 1.5rem; } }
+@media (min-width: 768px) { .season-header { padding: 3rem 2rem; } }
 
 .season-header h1 {
-  font-size: 2.5rem;
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
   font-weight: 700;
   margin: 0 0 1rem 0;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -39,7 +43,7 @@
 }
 
 .subtitle {
-  font-size: 1rem;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
   color: var(--on-surface-variant);
   margin: 0;
 }
@@ -47,33 +51,40 @@
 /* Controls Section */
 .controls-section {
   max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
+@media (min-width: 480px) { .controls-section { padding: 0 1.5rem; gap: 1.2rem; margin: 1.75rem auto; } }
+@media (min-width: 768px) { .controls-section { padding: 0 2rem; gap: 2rem; margin: 2rem auto; } }
 
 .selector-group {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
+@media (min-width: 480px) { .selector-group { gap: 0.75rem; } }
+@media (min-width: 768px) { .selector-group { gap: 1rem; } }
 
 .selector {
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.8rem;
   background: var(--surface-container);
   color: var(--on-surface);
   border: 1px solid rgba(70, 71, 82, 0.5);
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: clamp(0.8rem, 1.5vw, 0.95rem);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: inherit;
+  white-space: nowrap;
 }
-
+@media (min-width: 480px) { .selector { padding: 0.7rem 0.9rem; } }
+@media (min-width: 768px) { .selector { padding: 0.75rem 1rem; } }
 .selector:hover,
 .selector:focus {
   border-color: var(--secondary);
@@ -84,17 +95,19 @@
 /* View Toggle */
 .view-toggle {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.3rem;
   background: var(--surface-container);
-  padding: 0.4rem;
+  padding: 0.3rem;
   border-radius: 8px;
 }
+@media (min-width: 480px) { .view-toggle { gap: 0.4rem; padding: 0.35rem; } }
+@media (min-width: 768px) { .view-toggle { gap: 0.5rem; padding: 0.4rem; } }
 
 .toggle-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1rem;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem;
   background: transparent;
   color: var(--on-surface-variant);
   border: none;
@@ -102,8 +115,10 @@
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s ease;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
 }
-
+@media (min-width: 480px) { .toggle-btn { padding: 0.6rem 0.9rem; gap: 0.5rem; } }
+@media (min-width: 768px) { .toggle-btn { padding: 0.65rem 1rem; } }
 .toggle-btn:hover {
   color: var(--on-surface);
 }
@@ -116,32 +131,40 @@
 /* Filters Section */
 .filters-section {
   max-width: 1200px;
-  margin: 1.5rem auto;
-  padding: 0 2rem;
+  margin: 1rem auto;
+  padding: 0 1rem;
 }
+@media (min-width: 480px) { .filters-section { padding: 0 1.5rem; margin: 1.25rem auto; } }
+@media (min-width: 768px) { .filters-section { padding: 0 2rem; margin: 1.5rem auto; } }
 
 .filter-chips {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
+@media (min-width: 480px) { .filter-chips { gap: 0.6rem; } }
+@media (min-width: 768px) { .filter-chips { gap: 0.75rem; } }
 
 .filter-chip {
-  padding: 0.5rem 1.25rem;
+  padding: 0.4rem 1rem;
   background: var(--surface-container);
   color: var(--on-surface-variant);
   border: 1px solid rgba(70, 71, 82, 0.5);
   border-radius: 20px;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 1.2vw, 0.9rem);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
 }
-
-.filter-chip:hover {
-  border-color: var(--secondary);
-  color: var(--secondary);
+@media (min-width: 480px) { .filter-chip { padding: 0.5rem 1.1rem; } }
+@media (min-width: 768px) { .filter-chip { padding: 0.5rem 1.25rem; } }
+.filter-chip:active { border-color: var(--secondary); color: var(--secondary); }
+@media (min-width: 768px) {
+  .filter-chip:hover {
+    border-color: var(--secondary);
+    color: var(--secondary);
+  }
 }
 
 .filter-chip.active {
@@ -153,55 +176,83 @@
 /* Calendar View */
 .calendar-view {
   max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 2rem 3rem;
+  margin: 1.5rem auto;
+  padding: 0 1rem 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+@media (min-width: 480px) {
+  .calendar-view {
+    padding: 0 1.5rem 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.2rem;
+    margin: 1.75rem auto;
+  }
+}
+@media (min-width: 768px) {
+  .calendar-view {
+    padding: 0 2rem 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem;
+    margin: 2rem auto;
+  }
 }
 
 .day-section {
   background: var(--surface-container);
-  padding: 1.5rem;
+  padding: 1rem;
   border-radius: 12px;
   border: 1px solid rgba(70, 71, 82, 0.3);
 }
+@media (min-width: 480px) { .day-section { padding: 1.2rem; } }
+@media (min-width: 768px) { .day-section { padding: 1.5rem; } }
 
 .day-title {
-  font-size: 1.1rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
   font-weight: 700;
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.75rem 0;
   color: var(--secondary);
   text-align: center;
 }
+@media (min-width: 480px) { .day-title { margin: 0 0 0.85rem 0; } }
+@media (min-width: 768px) { .day-title { margin: 0 0 1rem 0; } }
 
 .day-anime {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
+@media (min-width: 480px) { .day-anime { gap: 0.6rem; } }
+@media (min-width: 768px) { .day-anime { gap: 0.75rem; } }
 
 .anime-card-season {
   display: flex;
-  gap: 0.75rem;
-  padding: 0.75rem;
+  gap: 0.5rem;
+  padding: 0.6rem;
   background: var(--surface-container-low);
   border-radius: 8px;
   transition: all 0.3s ease;
   cursor: pointer;
 }
-
-.anime-card-season:hover {
-  background: var(--surface-container-high);
+@media (min-width: 480px) { .anime-card-season { gap: 0.65rem; padding: 0.7rem; } }
+@media (min-width: 768px) { .anime-card-season { gap: 0.75rem; padding: 0.75rem; } }
+.anime-card-season:active { background: var(--surface-container-high); }
+@media (min-width: 768px) {
+  .anime-card-season:hover {
+    background: var(--surface-container-high);
+  }
 }
 
 .anime-poster {
-  width: 50px;
-  height: 75px;
+  width: 40px;
+  height: 60px;
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
 }
+@media (min-width: 480px) { .anime-poster { width: 45px; height: 67px; } }
+@media (min-width: 768px) { .anime-poster { width: 50px; height: 75px; } }
 
 .anime-info {
   flex: 1;
