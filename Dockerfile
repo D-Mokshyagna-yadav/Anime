@@ -47,9 +47,14 @@ COPY backend/package.json backend/package-lock.json ./backend/
 # Install only production dependencies for backend
 RUN npm ci --workspace=backend --omit=dev --legacy-peer-deps
 
+# Install Prisma CLI and engines in the production image so runtime provider-specific
+# generation can run without downloading tools on startup.
+RUN npm install --workspace=backend --no-save prisma@5.22.0 @prisma/engines@5.22.0
+
 # Copy pre-generated Prisma client from builder stage
 COPY --from=builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
 COPY --from=builder /app/backend/node_modules/@prisma ./backend/node_modules/@prisma
+COPY --from=builder /root/.cache/prisma /root/.cache/prisma
 
 # Copy built backend and frontend
 COPY --from=builder /app/backend/dist ./backend/dist
@@ -63,4 +68,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && node backend/dist/index.js"]
+CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && npx prisma generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]

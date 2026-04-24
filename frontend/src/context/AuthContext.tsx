@@ -37,18 +37,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await authLogin(email.trim().toLowerCase(), password);
-    if (response.data.success) {
-      localStorage.setItem('authToken', response.data.token);
-      setUser(response.data.user);
+    if (!response.data.success) {
+      throw new Error('Invalid email or password.');
     }
+
+    localStorage.setItem('authToken', response.data.token);
+    setUser(response.data.user);
   };
 
   const signup = async (email: string, password: string) => {
     const response = await authSignup(email.trim().toLowerCase(), password);
-    if (response.data.success) {
-      localStorage.setItem('authToken', response.data.token);
-      setUser(response.data.user);
+    if (!response.data.success) {
+      throw new Error('Registration failed.');
     }
+
+    localStorage.setItem('authToken', response.data.token);
+    setUser(response.data.user);
   };
 
   const logout = () => {
