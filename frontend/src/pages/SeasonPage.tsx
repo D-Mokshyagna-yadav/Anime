@@ -161,14 +161,14 @@ const SeasonPage: React.FC = () => {
                         whileHover={{ y: -4 }}
                         className="anime-card-season"
                       >
-                        <Link to={`/anime/${a.id}`}>
+                        <Link to={`/anime/${a.id}`} className="season-card-link">
                           <img 
                             src={getAnimePosterImage(a)} 
                             alt={a.title} 
-                            className="anime-poster"
+                            className="season-anime-poster"
                             onError={(e) => applyImageFallback(e.currentTarget)}
                           />
-                          <div className="anime-info">
+                          <div className="season-anime-info">
                             <h4>{a.title}</h4>
                             <p className="episode-info">Ep {a.episode}</p>
                             <p className="rating-info">⭐ {(a.score || 0) / 10}</p>
@@ -204,10 +204,10 @@ const SeasonPage: React.FC = () => {
                   <img 
                     src={getAnimePosterImage(item)} 
                     alt={item.title} 
-                    className="list-poster"
+                    className="season-list-poster"
                     onError={(e) => applyImageFallback(e.currentTarget)}
                   />
-                  <div className="list-info">
+                  <div className="season-list-info">
                     <h3>{item.title}</h3>
                     <div className="meta-info">
                       <span className="day-label">{days[item.dayOfWeek]}</span>

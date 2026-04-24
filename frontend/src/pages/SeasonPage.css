@@ -227,8 +227,6 @@
 @media (min-width: 768px) { .day-anime { gap: 0.75rem; } }
 
 .anime-card-season {
-  display: flex;
-  gap: 0.5rem;
   padding: 0.6rem;
   background: var(--surface-container-low);
   border-radius: 8px;
@@ -244,22 +242,33 @@
   }
 }
 
-.anime-poster {
+.season-card-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+}
+@media (min-width: 480px) { .season-card-link { gap: 0.65rem; } }
+@media (min-width: 768px) { .season-card-link { gap: 0.75rem; } }
+
+.season-anime-poster {
   width: 40px;
   height: 60px;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
+  background: var(--surface-container-high);
 }
-@media (min-width: 480px) { .anime-poster { width: 45px; height: 67px; } }
-@media (min-width: 768px) { .anime-poster { width: 50px; height: 75px; } }
+@media (min-width: 480px) { .season-anime-poster { width: 45px; height: 67px; } }
+@media (min-width: 768px) { .season-anime-poster { width: 50px; height: 75px; } }
 
-.anime-info {
+.season-anime-info {
   flex: 1;
   min-width: 0;
 }
 
-.anime-info h4 {
+.season-anime-info h4 {
   margin: 0 0 0.25rem 0;
   font-size: 0.85rem;
   font-weight: 600;
@@ -295,7 +304,6 @@
 
 .list-item {
   display: flex;
-  gap: 1.5rem;
   padding: 1.5rem;
   background: var(--surface-container);
   border-radius: 12px;
@@ -309,19 +317,29 @@
   transform: translateX(4px);
 }
 
-.list-poster {
-  width: 100px;
-  height: 150px;
+.list-link {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.season-list-poster {
+  width: clamp(82px, 10vw, 100px);
+  height: auto;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 8px;
   flex-shrink: 0;
+  background: var(--surface-container-high);
 }
 
-.list-info {
+.season-list-info {
   flex: 1;
+  min-width: 0;
 }
 
-.list-info h3 {
+.season-list-info h3 {
   margin: 0 0 0.75rem 0;
   font-size: 1.1rem;
   font-weight: 600;
@@ -455,6 +473,10 @@
   }
 
   .list-item {
+    padding: 1rem;
+  }
+
+  .list-link {
     flex-direction: column;
     text-align: center;
     gap: 1rem;
@@ -494,21 +516,21 @@
     padding: 0.75rem;
   }
 
-  .anime-poster {
+  .season-anime-poster {
     width: 40px;
     height: 60px;
   }
 
-  .anime-info h4 {
+  .season-anime-info h4 {
     font-size: 0.75rem;
   }
 
-  .list-poster {
+  .season-list-poster {
     width: 80px;
-    height: 120px;
+    height: auto;
   }
 
-  .list-info h3 {
+  .season-list-info h3 {
     font-size: 0.95rem;
   }
 }

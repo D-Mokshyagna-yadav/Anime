@@ -2,11 +2,6 @@ FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
-ARG DATABASE_URL=mongodb://127.0.0.1:27017/anistream
-ARG DB_TYPE
-ENV DATABASE_URL=${DATABASE_URL}
-ENV DB_TYPE=${DB_TYPE}
-
 # Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 make g++ openssl ca-certificates && \
@@ -45,11 +40,6 @@ WORKDIR /app
 # Install curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates openssl && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_ENV=production
-ENV PORT=5000
-ENV DATABASE_URL=""
-ENV DB_TYPE=""
-
 # Copy package files for production dependency resolution
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/package-lock.json ./backend/
@@ -72,7 +62,7 @@ COPY --from=builder /app/backend/scripts ./backend/scripts
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:${PORT}/api/health || exit 1
+    CMD curl -f http://localhost:5000/api/health || exit 1
 
 EXPOSE 5000
 
