@@ -13,7 +13,7 @@ RUN npm ci
 COPY . .
 
 RUN npm install
-RUN npm install --include=optional --workspace=frontend
+RUN npm install --workspace=frontend --no-save @rolldown/binding-linux-x64-gnu@1.0.0-rc.16
 RUN npm run build
 RUN npm prune --omit=dev
 
