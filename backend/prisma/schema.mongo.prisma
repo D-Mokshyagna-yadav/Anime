@@ -1,10 +1,3 @@
-// GENERATED FILE
-// Default checked-in schema is MongoDB (primary datastore)
-// Run: npm run prisma:prepare
-// Source templates:
-// - prisma/schema.mongo.prisma
-// - prisma/schema.sql.prisma
-
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")

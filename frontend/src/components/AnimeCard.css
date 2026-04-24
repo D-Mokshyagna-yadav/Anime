@@ -3,6 +3,8 @@
   text-decoration: none; 
   flex-shrink: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  min-width: 0;
 }
 .card-link:active {
   transform: translateY(-2px);
@@ -23,6 +25,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  aspect-ratio: 2 / 3;
+}
+
+.card-link.small .card-poster {
+  aspect-ratio: 7 / 10;
 }
 .card-poster img {
   width: 100%; 
@@ -120,6 +127,16 @@
   display: flex; 
   flex-direction: column; 
   gap: 4px;
+}
+
+.card-link:focus-visible {
+  outline: 3px solid var(--primary-dim);
+  outline-offset: 3px;
+  border-radius: 14px;
+}
+
+body.device-tv .card-title {
+  font-size: clamp(0.85rem, 1.1vw, 1.1rem);
 }
 @media (min-width: 480px) { .card-info { padding: 12px 12px 14px; gap: 6px; } }
 .card-title {

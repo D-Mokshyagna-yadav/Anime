@@ -24,6 +24,15 @@
   --radius:       12px;
   --radius-lg:    20px;
   --transition:   0.2s ease;
+  --layout-max:   min(1800px, 96vw);
+  --left-rail-width: clamp(220px, 16vw, 300px);
+  --topbar-height: clamp(56px, 7vh, 78px);
+  --adaptive-grid-columns: 4;
+  --adaptive-ui-scale: 1;
+  --space-1: clamp(0.4rem, 0.35rem + 0.3vw, 0.75rem);
+  --space-2: clamp(0.65rem, 0.55rem + 0.4vw, 1rem);
+  --space-3: clamp(0.9rem, 0.75rem + 0.5vw, 1.35rem);
+  --space-4: clamp(1.1rem, 0.9rem + 0.8vw, 2rem);
 }
 
 html { scroll-behavior: smooth; }
@@ -35,6 +44,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  font-size: calc(16px * var(--adaptive-ui-scale));
 }
 
 a { color: inherit; text-decoration: none; }
@@ -47,7 +57,7 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
 ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 99px; }
 
 /* Utility */
-.container { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+.container { max-width: var(--layout-max); margin: 0 auto; padding: 0 var(--space-3); }
 @media (min-width: 480px) { .container { padding: 0 20px; } }
 @media (min-width: 768px) { .container { padding: 0 24px; } }
 @media (min-width: 1024px) { .container { padding: 0 28px; } }
@@ -150,3 +160,67 @@ button { cursor: pointer; border: none; outline: none; font-family: inherit; }
   scrollbar-width: thin;
 }
 .h-scroll::-webkit-scrollbar { height: 4px; }
+
+.route-loader {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-size: clamp(0.95rem, 1.2vw, 1.2rem);
+  color: var(--text-muted);
+}
+
+body.has-left-rail .page,
+body.has-left-rail .watch-page {
+  padding-left: var(--left-rail-width);
+}
+
+@media (max-width: 1024px) {
+  body.has-left-rail .page,
+  body.has-left-rail .watch-page {
+    padding-left: 0;
+  }
+}
+
+body.input-touch button,
+body.input-touch .btn-primary,
+body.input-touch .btn-ghost,
+body.input-touch .nav-link,
+body.input-touch a {
+  min-height: 48px;
+}
+
+body.input-remote *:focus-visible,
+body.device-tv *:focus-visible {
+  outline: 3px solid var(--primary-dim);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+body.input-remote .anime-card:hover,
+body.device-tv .anime-card:hover,
+body.input-remote .nav-link:hover,
+body.device-tv .nav-link:hover {
+  transform: none;
+  box-shadow: none;
+  background: inherit;
+}
+
+body.device-tv {
+  letter-spacing: 0.01em;
+}
+
+body.device-tv .container {
+  max-width: 98vw;
+}
+
+body.device-tv .h-scroll {
+  overflow: visible;
+  display: grid;
+  grid-template-columns: repeat(var(--adaptive-grid-columns), minmax(0, 1fr));
+  gap: var(--space-3);
+  padding-bottom: 0;
+}
+
+body.device-tv .h-scroll > * {
+  min-width: 0;
+}

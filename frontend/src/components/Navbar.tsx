@@ -1,17 +1,41 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X, Tv2, User, LogOut } from 'lucide-react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Home, Search, X, Tv2, User, LogOut, ListVideo, Film, Bookmark, Settings, PlayCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useAdaptive } from '../context/AdaptiveContext';
 import './Navbar.css';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
+  const { deviceType, isRemoteLike } = useAdaptive();
+
+  const isMobile = deviceType === 'mobile';
+  const hasLeftRail = deviceType === 'desktop' || deviceType === 'tv';
+  const optionalAvatarUser = user as (typeof user & { avatarUrl?: string; image?: string }) | null;
+  const avatarUrl = optionalAvatarUser?.avatarUrl || optionalAvatarUser?.image || '';
+  const avatarInitials = user?.email
+    ? user.email
+        .split('@')[0]
+        .split(/[._-]+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join('') || 'U'
+    : 'U';
+
+  const navItems = [
+    { to: '/', label: 'Home', icon: Home },
+    { to: '/season', label: 'Season', icon: ListVideo },
+    { to: '/recommendations', label: 'Recommended', icon: Film },
+    { to: '/watchlist', label: 'Watchlist', icon: Bookmark },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -35,92 +59,161 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     navigate('/');
+    setProfileMenuOpen(false);
   };
 
+  useEffect(() => {
+    const onClickOutside = (event: MouseEvent) => {
+      if (!profileMenuRef.current) return;
+      if (event.target instanceof Node && !profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('mousedown', onClickOutside);
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('mousedown', onClickOutside);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
+
+  const renderLinks = (className = 'navbar-links') => (
+    <div className={className} role="navigation" aria-label="Primary">
+      {navItems.map((item) => (
+        <NavLink key={item.to} to={item.to} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+          <item.icon size={18} />
+          <span>{item.label}</span>
+        </NavLink>
+      ))}
+    </div>
+  );
+
   return (
-    <nav className={`navbar glass ${scrolled ? 'scrolled' : ''}`}>
-      <div className="container navbar-inner">
-        {/* Logo */}
-        <Link to="/" className="navbar-logo">
-          <Tv2 size={26} color="var(--primary)" strokeWidth={2.5} />
-          <span>Ani<strong>Stream</strong></span>
-        </Link>
+    <>
+      <nav className={`navbar glass ${scrolled ? 'scrolled' : ''} ${hasLeftRail ? 'with-rail' : ''}`}>
+        <div className="container navbar-inner">
+          <Link to="/" className="navbar-logo" aria-label="AniStream Home">
+            <Tv2 size={26} color="var(--primary)" strokeWidth={2.5} />
+            <span>Ani<strong>Stream</strong></span>
+          </Link>
 
-        {/* Desktop Links */}
-        <div className="navbar-links">
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/season" className="nav-link">Season</Link>
-          <Link to="/recommendations" className="nav-link">Recommendations</Link>
-          <Link to="/continue-watching" className="nav-link">Continue</Link>
-          <Link to="/search?type=tv" className="nav-link">TV Series</Link>
-          <Link to="/search?type=movie" className="nav-link">Movies</Link>
-        </div>
+          {!isMobile && renderLinks()}
 
-        {/* Actions */}
-        <div className="navbar-actions">
-          {searchOpen ? (
-            <form onSubmit={handleSearch} className="search-form">
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Search anime..."
-                className="search-input"
-              />
-              <button type="button" onClick={() => setSearchOpen(false)} className="icon-btn">
-                <X size={18} />
+          <div className="navbar-actions">
+            {(searchOpen || !isMobile) && (
+              <form onSubmit={handleSearch} className="search-form" role="search">
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search anime..."
+                  className="search-input"
+                  aria-label="Search anime"
+                />
+                <button type="button" onClick={() => setSearchOpen(false)} className="icon-btn" aria-label="Close search">
+                  <X size={18} />
+                </button>
+              </form>
+            )}
+
+            {!searchOpen && (
+              <button
+                className="icon-btn"
+                onClick={() => (isMobile ? navigate('/search') : setSearchOpen(true))}
+                aria-label="Open search"
+              >
+                <Search size={20} />
               </button>
-            </form>
-          ) : (
-            <button className="icon-btn" onClick={() => setSearchOpen(true)}>
-              <Search size={20} />
-            </button>
-          )}
-          
-          {user ? (
-            <>
-              <Link to="/profile" className="nav-link" style={{ fontSize: '0.875rem' }}>
-                <User size={15} /> Profile
-              </Link>
-              <Link to="/settings" className="nav-link" style={{ fontSize: '0.875rem' }}>
-                ⚙️ Settings
-              </Link>
-              <button onClick={handleLogout} className="btn-ghost" style={{ padding: '8px 12px', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <LogOut size={14} /> Sign Out
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="btn-ghost" style={{ padding: '8px 16px', fontSize: '0.875rem' }}>
-                <User size={15} /> Sign In
-              </Link>
-              <Link to="/register" className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.875rem' }}>
-                Register
-              </Link>
-            </>
-          )}
-          
-          <button className="icon-btn mobile-menu-btn" onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-      </div>
+            )}
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="mobile-menu">
-          <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
-          <Link to="/season" onClick={() => setMenuOpen(false)}>Season</Link>
-          <Link to="/recommendations" onClick={() => setMenuOpen(false)}>Recommendations</Link>
-          <Link to="/continue-watching" onClick={() => setMenuOpen(false)}>Continue Watching</Link>
-          <Link to="/search?type=tv" onClick={() => setMenuOpen(false)}>TV Series</Link>
-          <Link to="/search?type=movie" onClick={() => setMenuOpen(false)}>Movies</Link>
-          <Link to="/profile" onClick={() => setMenuOpen(false)}>Profile</Link>
-          <Link to="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
-          <Link to="/login" onClick={() => setMenuOpen(false)}>Sign In</Link>
-          <Link to="/register" onClick={() => setMenuOpen(false)}>Register</Link>
+            {user ? (
+              <div className="profile-menu-wrap" ref={profileMenuRef}>
+                <button
+                  className="profile-icon-btn"
+                  aria-label="Open account menu"
+                  aria-haspopup="menu"
+                  aria-expanded={profileMenuOpen}
+                  onClick={() => setProfileMenuOpen((open) => !open)}
+                >
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Profile" className="profile-avatar-img" />
+                  ) : (
+                    <span className="profile-avatar-initials">{avatarInitials}</span>
+                  )}
+                </button>
+
+                <div
+                  className={`profile-dropdown ${profileMenuOpen ? 'open' : ''}`}
+                  role="menu"
+                  aria-label="Account menu"
+                  aria-hidden={!profileMenuOpen}
+                >
+                    <NavLink to="/continue-watching" onClick={() => setProfileMenuOpen(false)}>
+                      <PlayCircle size={16} /> Continue Watching
+                    </NavLink>
+                    <NavLink to="/settings" onClick={() => setProfileMenuOpen(false)}>
+                      <Settings size={16} /> Settings
+                    </NavLink>
+                    <button onClick={handleLogout} className="profile-logout-btn">
+                      <LogOut size={16} /> Logout
+                    </button>
+                </div>
+              </div>
+            ) : (
+              !isMobile && (
+                <>
+                  <Link to="/login" className="btn-ghost compact-btn">
+                    <User size={15} /> <span>Sign In</span>
+                  </Link>
+                  <Link to="/register" className="btn-primary compact-btn">
+                    Register
+                  </Link>
+                </>
+              )
+            )}
+          </div>
         </div>
+      </nav>
+
+      {hasLeftRail && (
+        <aside className={`left-rail ${isRemoteLike ? 'remote-nav' : ''}`} aria-label="Sidebar navigation">
+          <div className="left-rail-brand">
+            <Tv2 size={24} color="var(--primary-dim)" />
+            <span>Browse</span>
+          </div>
+
+          <div className="left-rail-links">
+            {navItems.map((item) => (
+              <NavLink key={item.to} to={item.to} className={({ isActive }) => `rail-link ${isActive ? 'active' : ''}`}>
+                <item.icon size={18} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+            <NavLink to="/search" className={({ isActive }) => `rail-link ${isActive ? 'active' : ''}`}>
+              <Search size={18} />
+              <span>Search</span>
+            </NavLink>
+          </div>
+        </aside>
       )}
-    </nav>
+
+      {isMobile && (
+        <nav className="mobile-bottom-nav" aria-label="Bottom navigation">
+          {navItems.map((item) => (
+            <NavLink key={item.to} to={item.to} className={({ isActive }) => `bottom-link ${isActive ? 'active' : ''}`}>
+              <item.icon size={18} />
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </nav>
+      )}
+    </>
   );
 }

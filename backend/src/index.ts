@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import animeRouter from './routes/anime';
 import userRouter from './routes/user';
+import { connectPrismaWithRetry, registerPrismaShutdownHooks } from './lib/prisma';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,8 +68,21 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 AniStream backend running at http://localhost:${PORT}`);
-});
+async function bootstrap() {
+  try {
+    await connectPrismaWithRetry();
+    registerPrismaShutdownHooks();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 AniStream backend running at http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[startup] Failed to initialize backend: ${message}`);
+    process.exit(1);
+  }
+}
+
+void bootstrap();
 
 export default app;

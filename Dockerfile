@@ -2,6 +2,11 @@ FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
+ARG DATABASE_URL=mongodb://127.0.0.1:27017/anistream
+ARG DB_TYPE
+ENV DATABASE_URL=${DATABASE_URL}
+ENV DB_TYPE=${DB_TYPE}
+
 # Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 make g++ openssl ca-certificates && \
@@ -17,6 +22,9 @@ COPY . .
 
 # Install all dependencies for root, backend, and frontend workspaces (including devDependencies)
 RUN npm ci
+
+# Prepare Prisma schema/provider and generate client for build-time tasks.
+RUN npm run prisma:prepare --workspace=backend && npm run prisma:generate --workspace=backend
 
 # Install all native bindings explicitly
 RUN npm install --workspace=frontend --no-save \
@@ -39,6 +47,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certifi
 
 ENV NODE_ENV=production
 ENV PORT=5000
+ENV DATABASE_URL=""
+ENV DB_TYPE=""
 
 # Copy package files for production dependency resolution
 COPY package.json package-lock.json ./
@@ -46,6 +56,9 @@ COPY backend/package.json backend/package-lock.json ./backend/
 
 # Install only production dependencies for backend
 RUN npm ci --workspace=backend --omit=dev --legacy-peer-deps
+
+# Install Prisma CLI for runtime generate (required for DB provider switching).
+RUN npm install --workspace=backend --no-save prisma@5.22.0
 
 # Copy pre-generated Prisma client from builder stage
 COPY --from=builder /app/backend/node_modules/.prisma ./backend/node_modules/.prisma
@@ -55,6 +68,7 @@ COPY --from=builder /app/backend/node_modules/@prisma ./backend/node_modules/@pr
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/frontend/dist ./frontend/dist
 COPY --from=builder /app/backend/prisma ./backend/prisma
+COPY --from=builder /app/backend/scripts ./backend/scripts
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
@@ -62,4 +76,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 EXPOSE 5000
 
-CMD ["node", "backend/dist/index.js"]
+CMD ["sh", "-c", "node backend/scripts/prepare-prisma-schema.cjs && npx --yes prisma@5.22.0 generate --schema backend/prisma/schema.prisma && node backend/dist/index.js"]

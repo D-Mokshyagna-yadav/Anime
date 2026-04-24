@@ -4,6 +4,7 @@ import Hls from 'hls.js';
 import { ChevronLeft, ChevronRight, List, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
+import { useAdaptive } from '../context/AdaptiveContext';
 import type { AniMedia } from '../api/client';
 import {
   fetchStream,
@@ -132,6 +133,7 @@ export default function WatchPage() {
   const [language, setLanguage] = useState<'sub' | 'dub'>('sub');
   const [autoNext, setAutoNext] = useState(true);
   const [embedUrl, setEmbedUrl] = useState('');
+  const { deviceType, inputType } = useAdaptive();
 
   const decodedEpId = episodeId ? decodeURIComponent(episodeId) : '';
   const currentEpisode = episodes.find((episode) => episode.id === decodedEpId);
@@ -178,6 +180,20 @@ export default function WatchPage() {
 
     return () => clearInterval(interval);
   }, [animeId, episodeId, anime, currentEpNum]);
+
+  useEffect(() => {
+    if (deviceType !== 'tv' || provider !== 'direct') return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onPlay = () => {
+      if (document.fullscreenElement) return;
+      video.requestFullscreen?.().catch(() => {});
+    };
+
+    video.addEventListener('play', onPlay);
+    return () => video.removeEventListener('play', onPlay);
+  }, [deviceType, provider]);
 
   useEffect(() => {
     const handler = (event: MessageEvent) => {
@@ -379,7 +395,7 @@ export default function WatchPage() {
   const title = anime ? (anime.title.english || anime.title.romaji) : 'Loading...';
 
   return (
-    <div className="watch-page">
+    <div className="watch-page" data-device={deviceType} data-input={inputType}>
       <Navbar />
 
       <div className="watch-layout container">
@@ -392,7 +408,7 @@ export default function WatchPage() {
             <span>Episode {currentEpNum}</span>
           </div>
 
-          <div className="player-wrapper">
+          <div className="player-wrapper" role="region" aria-label="Anime video player">
             {provider === 'megaplay' ? (
               <>
                 {loading && !embedUrl && !playerError && (
@@ -421,6 +437,7 @@ export default function WatchPage() {
                     scrolling="no"
                     allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                     allowFullScreen
+                    title={`Video player for ${title} episode ${currentEpNum}`}
                     referrerPolicy="origin-when-cross-origin"
                     style={{ minHeight: 500, display: playerError ? 'none' : 'block' }}
                   />
@@ -450,6 +467,9 @@ export default function WatchPage() {
                   className="player-video"
                   controls
                   playsInline
+                  muted={deviceType === 'mobile'}
+                  autoPlay={deviceType !== 'desktop'}
+                  aria-label={`Direct stream player for ${title} episode ${currentEpNum}`}
                   style={{ display: loading || error ? 'none' : 'block' }}
                   onError={() => setError('Video playback failed. Try MegaPlay.')}
                 />
@@ -468,7 +488,7 @@ export default function WatchPage() {
               </button>
             </div>
 
-            <div className="controls-group">
+            <div className="controls-group" role="group" aria-label="Playback controls">
               <select value={provider} onChange={(event) => setProvider(event.target.value as Provider)} className="control-select">
                 <option value="megaplay">Provider: MegaPlay</option>
                 <option value="direct">Provider: Direct</option>

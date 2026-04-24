@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "npx ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "npx tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prisma:prepare": "node ./scripts/prepare-prisma-schema.cjs",
+    "prisma:generate": "npm run prisma:prepare && npx prisma generate",
+    "prisma:db:push": "npm run prisma:prepare && npx prisma db push",
+    "prisma:migrate": "npm run prisma:prepare && npx prisma migrate dev"
   },
   "keywords": [],
   "author": "",
